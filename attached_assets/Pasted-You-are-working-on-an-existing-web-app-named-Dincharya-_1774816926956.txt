@@ -1,0 +1,109 @@
+You are working on an existing web app named "Dincharya" built using HTML, CSS, and JavaScript.
+
+CONTEXT:
+- Signup page is already completed
+- User data is stored in localStorage:
+  - "name"
+  - "age"
+  - "goal"
+  - "email"
+
+- Flow:
+  signup.html → prakriti.html → guna.html → dashboard.html
+
+--------------------------------------------------
+
+TASK: CREATE PRAKRITI PAGE (prakriti.html)
+
+1. UI REQUIREMENTS:
+- Maintain same design theme:
+  - Soft green + beige colors
+  - Rounded cards
+  - Mobile layout (max-width ~380px)
+- Clean and minimal UI
+
+--------------------------------------------------
+
+2. GREETING (IMPORTANT):
+- Fetch user's name from localStorage:
+  localStorage.getItem("name")
+
+- Display:
+  "Namaste, [User Name]"
+
+--------------------------------------------------
+
+3. PRAKRITI TEST (CORE FEATURE):
+
+Create 8 multiple-choice questions.
+
+Each question must have 3 options:
+- Vata
+- Pitta
+- Kapha
+
+Example Questions:
+- Your body type:
+  - Thin → Vata
+  - Medium → Pitta
+  - Heavy → Kapha
+
+- Your digestion:
+  - Irregular → Vata
+  - Strong → Pitta
+  - Slow → Kapha
+
+--------------------------------------------------
+
+4. SCORING LOGIC:
+
+- Initialize:
+  vata = 0
+  pitta = 0
+  kapha = 0
+
+- For each selected answer:
+  increase respective score
+
+- After submission:
+  - Find highest score
+  - Determine dominant Prakriti
+
+--------------------------------------------------
+
+5. STORE RESULT:
+
+Save in localStorage:
+- key: "prakriti"
+- value: "Vata" or "Pitta" or "Kapha"
+
+--------------------------------------------------
+
+6. REDIRECT (CONTINUATION):
+
+After submission:
+- Redirect to next page:
+  window.location.href = "./guna.html";
+
+--------------------------------------------------
+
+7. EXTRA FEATURES:
+- Show question number (e.g., 1/8)
+- Use radio buttons
+- Add "Submit" button
+- Validate:
+  - All questions must be answered
+
+--------------------------------------------------
+
+STRICT RULES:
+- Do NOT break design consistency
+- Do NOT use frameworks
+- Keep code clean and simple
+- Ensure it works with localStorage from signup page
+
+--------------------------------------------------
+
+OUTPUT:
+- Provide FULL code for prakriti.html (HTML + CSS + JS)
+- No explanation
