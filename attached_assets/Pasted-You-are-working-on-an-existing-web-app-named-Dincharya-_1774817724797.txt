@@ -1,0 +1,127 @@
+You are working on an existing web app named "Dincharya" built using HTML, CSS, and JavaScript.
+
+CONTEXT:
+- Previous pages are completed:
+  signup.html → prakriti.html → guna.html
+- After guna submission, user is redirected to:
+  "./dashboard.html"
+
+- Data stored in localStorage:
+  - "name"
+  - "age"
+  - "goal"
+  - "email"
+  - "prakriti"
+  - "guna"
+
+--------------------------------------------------
+
+TASK: CREATE A SEPARATE USER DASHBOARD PAGE (dashboard.html)
+
+IMPORTANT:
+This is a NEW page (user homepage), NOT part of previous pages.
+User must land here after guna test.
+
+--------------------------------------------------
+
+1. UI DESIGN REQUIREMENTS:
+- Modern wellness UI (like premium mobile apps)
+- Soft green + beige color palette
+- Rounded cards (border-radius 20px+)
+- Clean spacing, minimal layout
+- Mobile-first (max-width: 380px, centered)
+
+--------------------------------------------------
+
+2. HEADER SECTION:
+- App name: "Dincharya"
+- Greeting:
+  "Namaste, [User Name]" (from localStorage)
+
+--------------------------------------------------
+
+3. DINACHARYA SCORE (MAIN FEATURE):
+- Large highlighted card at top
+- Show:
+  - "Dinacharya Score: 78%"
+  - Small text: "+10% better than yesterday"
+
+- Use:
+  - Progress bar OR circular indicator
+
+(Default score can be static for now)
+
+--------------------------------------------------
+
+4. TODAY’S DINACHARYA (INPUT SECTION):
+Create a card with inputs:
+- Wake-up time (time input)
+- Sleep time (time input)
+- Meal timing (time/text)
+- Screen time (number input)
+
+Button:
+- "Save Today’s Data"
+
+Functionality:
+- Store data in localStorage as "dailyData"
+
+--------------------------------------------------
+
+5. HABIT STREAK SYSTEM:
+- Show:
+  "🔥 X Day Streak"
+
+Logic:
+- If user saves data → increment streak
+- Store in localStorage as "streak"
+
+--------------------------------------------------
+
+6. USER INSIGHTS (IKS PROFILE):
+Display:
+- Prakriti: [value]
+- Guna: [value]
+- Goal: [value]
+
+--------------------------------------------------
+
+7. PERSONALIZED DIET:
+- Based on "prakriti":
+
+IF:
+- Vata → warm, grounding foods
+- Pitta → cooling foods
+- Kapha → light, stimulating foods
+
+Display as a clean card:
+"Your Personalized Diet"
+
+--------------------------------------------------
+
+8. REMINDER SECTION:
+- Static suggestions:
+  - "Sleep before 10 PM"
+  - "Avoid late-night screen exposure"
+  - "Maintain regular meal timing"
+
+--------------------------------------------------
+
+9. FUNCTIONAL REQUIREMENTS:
+- Fetch all data from localStorage
+- Ensure no errors if data exists
+- Ensure page loads correctly after redirect
+
+--------------------------------------------------
+
+STRICT RULES:
+- Do NOT use frameworks (only HTML, CSS, JS)
+- Do NOT break previous flow
+- Keep UI clean and minimal
+- Do NOT overcomplicate logic
+
+--------------------------------------------------
+
+OUTPUT:
+- Provide FULL code for dashboard.html (HTML + CSS + JS)
+- No explanation
