@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up — Dincharya</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --green-50: #f0faf0;
+      --green-100: #daf3d8;
+      --green-200: #b5e6b2;
+      --green-400: #5cb85c;
+      --green-500: #4aa04a;
+      --green-600: #3a8a3a;
+      --beige-50: #fdf8f0;
+      --beige-100: #f7edd8;
+      --beige-200: #edd9b8;
+      --brown-700: #5c4033;
+      --text-dark: #1e2d1f;
+      --text-mid: #4a5e4b;
+      --text-light: #7a9478;
+      --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.07);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #fafdf7;
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      background: rgba(250, 253, 247, 0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+      padding: 0.9rem 2rem;
+    }
+
+    .nav-container {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .logo-leaf { font-size: 1.4rem; }
+
+    .logo-text {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--green-600);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-back {
+      font-size: 0.9rem;
+      color: var(--text-mid);
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s;
+    }
+
+    .nav-back:hover { color: var(--green-600); }
+
+    /* ===== MAIN ===== */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bg-circle {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .circle-1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(90,185,90,0.08) 0%, transparent 70%);
+      top: -100px;
+      right: -80px;
+    }
+
+    .circle-2 {
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(237,217,184,0.3) 0%, transparent 70%);
+      bottom: 0;
+      left: -60px;
+    }
+
+    /* ===== CARD ===== */
+    .card {
+      background: white;
+      border-radius: 24px;
+      padding: 2.75rem 2.5rem;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.09);
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--beige-100);
+      color: var(--brown-700);
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-bottom: 1.4rem;
+      letter-spacing: 0.02em;
+    }
+
+    .card h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-subtitle {
+      font-size: 0.92rem;
+      color: var(--text-mid);
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    /* ===== FORM ===== */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-mid);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.02em;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1.5px solid #dce8dc;
+      border-radius: var(--radius-sm);
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      background: var(--green-50);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .form-group input::placeholder {
+      color: var(--text-light);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--green-400);
+      box-shadow: 0 0 0 3px rgba(90,185,90,0.12);
+      background: white;
+    }
+
+    .form-group input.input-error,
+    .form-group select.input-error {
+      border-color: #e05252;
+      box-shadow: 0 0 0 3px rgba(224,82,82,0.1);
+    }
+
+    .select-wrapper {
+      position: relative;
+    }
+
+    .select-wrapper::after {
+      content: '▾';
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+      pointer-events: none;
+      font-size: 0.85rem;
+    }
+
+    .error-msg {
+      font-size: 0.78rem;
+      color: #d64444;
+      margin-top: 0.4rem;
+      display: none;
+    }
+
+    .error-msg.visible {
+      display: block;
+    }
+
+    /* ===== BUTTON ===== */
+    .btn-continue {
+      width: 100%;
+      padding: 0.95rem;
+      background: var(--green-500);
+      color: white;
+      border: none;
+      border-radius: 999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 0.75rem;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(74,160,74,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-continue:hover {
+      background: var(--green-600);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(74,160,74,0.4);
+    }
+
+    .btn-continue:active {
+      transform: translateY(0);
+    }
+
+    /* ===== DIVIDER ===== */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 1.5rem 0 1.25rem;
+      color: var(--text-light);
+      font-size: 0.8rem;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e0ecdf;
+    }
+
+    .signin-link {
+      text-align: center;
+      font-size: 0.88rem;
+      color: var(--text-mid);
+    }
+
+    .signin-link a {
+      color: var(--green-600);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .signin-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* ===== ALERT ===== */
+    .alert {
+      display: none;
+      background: #fff3f3;
+      border: 1px solid #f5c2c2;
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      color: #c0392b;
+      margin-bottom: 1rem;
+    }
+
+    .alert.visible {
+      display: block;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 540px) {
+      .card {
+        padding: 2rem 1.5rem;
+        border-radius: 20px;
+      }
+
+      .card h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <span class="logo-leaf">🌿</span>
+        <span class="logo-text">Dincharya</span>
+      </a>
+      <a href="/" class="nav-back">← Back to Home</a>
+    </div>
+  </nav>
+
+  <!-- BG DECOR -->
+  <div class="bg-circle circle-1"></div>
+  <div class="bg-circle circle-2"></div>
+
+  <!-- MAIN CARD -->
+  <main>
+    <div class="card">
+      <div class="card-badge">🌿 Start Your Journey</div>
+      <h1>Create your account</h1>
+      <p class="card-subtitle">Tell us a little about yourself so we can personalise your Ayurvedic wellness plan.</p>
+
+      <div class="alert" id="globalAlert"></div>
+
+      <form id="signupForm" novalidate>
+
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" placeholder="e.g. Arjun Sharma" autocomplete="name" />
+          <span class="error-msg" id="nameError">Please enter your name.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="age">Age</label>
+          <input type="number" id="age" name="age" placeholder="e.g. 28" min="1" max="120" autocomplete="off" />
+          <span class="error-msg" id="ageError">Please enter a valid age (1–120).</span>
+        </div>
+
+        <div class="form-group">
+          <label for="goal">Your Wellness Goal</label>
+          <div class="select-wrapper">
+            <select id="goal" name="goal">
+              <option value="">— Select a goal —</option>
+              <option value="Better Sleep">Better Sleep</option>
+              <option value="Weight Balance">Weight Balance</option>
+              <option value="Stress Management">Stress Management</option>
+              <option value="Improve Digestion">Improve Digestion</option>
+              <option value="Boost Energy">Boost Energy</option>
+              <option value="Mental Clarity">Mental Clarity</option>
+              <option value="Skin Health">Skin Health</option>
+              <option value="General Wellness">General Wellness</option>
+            </select>
+          </div>
+          <span class="error-msg" id="goalError">Please select a wellness goal.</span>
+        </div>
+
+        <button type="button" class="btn-continue" id="continueBtn">
+          Continue →
+        </button>
+
+      </form>
+
+      <div class="divider">or</div>
+      <p class="signin-link">Already have an account? <a href="#">Sign in</a></p>
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById('signupForm');
+    const continueBtn = document.getElementById('continueBtn');
+
+    const nameInput = document.getElementById('name');
+    const ageInput = document.getElementById('age');
+    const goalInput = document.getElementById('goal');
+
+    const nameError = document.getElementById('nameError');
+    const ageError = document.getElementById('ageError');
+    const goalError = document.getElementById('goalError');
+    const globalAlert = document.getElementById('globalAlert');
+
+    function clearErrors() {
+      [nameInput, ageInput, goalInput].forEach(function(el) {
+        el.classList.remove('input-error');
+      });
+      [nameError, ageError, goalError].forEach(function(el) {
+        el.classList.remove('visible');
+      });
+      globalAlert.classList.remove('visible');
+      globalAlert.textContent = '';
+    }
+
+    function validate() {
+      clearErrors();
+      var valid = true;
+
+      var name = nameInput.value.trim();
+      var age = ageInput.value.trim();
+      var goal = goalInput.value;
+
+      if (!name) {
+        nameInput.classList.add('input-error');
+        nameError.classList.add('visible');
+        valid = false;
+      }
+
+      if (!age || isNaN(Number(age)) || Number(age) < 1 || Number(age) > 120) {
+        ageInput.classList.add('input-error');
+        ageError.classList.add('visible');
+        valid = false;
+      }
+
+      if (!goal) {
+        goalInput.classList.add('input-error');
+        goalError.classList.add('visible');
+        valid = false;
+      }
+
+      return valid;
+    }
+
+    continueBtn.addEventListener('click', function() {
+      if (!validate()) return;
+
+      var name = nameInput.value.trim();
+      var age = ageInput.value.trim();
+      var goal = goalInput.value;
+
+      try {
+        localStorage.setItem('name', name);
+        localStorage.setItem('age', age);
+        localStorage.setItem('goal', goal);
+        window.location.href = 'prakriti.html';
+      } catch (err) {
+        globalAlert.textContent = 'Something went wrong. Please try again.';
+        globalAlert.classList.add('visible');
+      }
+    });
+
+    nameInput.addEventListener('input', function() {
+      if (nameInput.value.trim()) {
+        nameInput.classList.remove('input-error');
+        nameError.classList.remove('visible');
+      }
+    });
+
+    ageInput.addEventListener('input', function() {
+      var v = Number(ageInput.value);
+      if (ageInput.value && v >= 1 && v <= 120) {
+        ageInput.classList.remove('input-error');
+        ageError.classList.remove('visible');
+      }
+    });
+
+    goalInput.addEventListener('change', function() {
+      if (goalInput.value) {
+        goalInput.classList.remove('input-error');
+        goalError.classList.remove('visible');
+      }
+    });
+  </script>
+
+</body>
+</html>
