@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guna Test — Dincharya</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-50:  #f0faf0;
+      --green-100: #daf3d8;
+      --green-200: #b5e6b2;
+      --green-400: #5cb85c;
+      --green-500: #4aa04a;
+      --green-600: #3a8a3a;
+      --beige-50:  #fdf8f0;
+      --beige-100: #f7edd8;
+      --beige-200: #edd9b8;
+      --brown-700: #5c4033;
+      --text-dark: #1e2d1f;
+      --text-mid:  #4a5e4b;
+      --text-light:#7a9478;
+      --radius-sm: 10px;
+      --radius:    16px;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #fafdf7;
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      background: rgba(250,253,247,0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+      padding: 0.9rem 2rem;
+    }
+
+    .nav-container {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .logo-leaf { font-size: 1.4rem; }
+
+    .logo-text {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--green-600);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-back {
+      font-size: 0.9rem;
+      color: var(--text-mid);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-back:hover { color: var(--green-600); }
+
+    /* ── BG DECOR ── */
+    .bg-circle {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .circle-1 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(90,185,90,0.08) 0%, transparent 70%);
+      top: -100px; right: -80px;
+    }
+
+    .circle-2 {
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, rgba(237,217,184,0.3) 0%, transparent 70%);
+      bottom: 0; left: -60px;
+    }
+
+    /* ── MAIN ── */
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 2.5rem 1.25rem 3rem;
+      position: relative;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── GREETING ── */
+    .greeting-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--beige-100);
+      color: var(--brown-700);
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-bottom: 0.9rem;
+      letter-spacing: 0.02em;
+    }
+
+    .greeting {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.03em;
+      margin-bottom: 0.4rem;
+    }
+
+    .greeting span { color: var(--green-500); }
+
+    .greeting-sub {
+      font-size: 0.88rem;
+      color: var(--text-mid);
+      line-height: 1.6;
+      margin-bottom: 1.6rem;
+    }
+
+    /* ── PROGRESS ── */
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .progress-track {
+      flex: 1;
+      background: var(--green-100);
+      border-radius: 999px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--green-500);
+      border-radius: 999px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    .progress-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--green-600);
+      white-space: nowrap;
+    }
+
+    /* ── QUESTION CARD ── */
+    .question-card {
+      background: white;
+      border-radius: 20px;
+      padding: 1.75rem 1.5rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      margin-bottom: 1rem;
+    }
+
+    .question-number {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--green-400);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    .question-text {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 1.1rem;
+      line-height: 1.4;
+    }
+
+    /* ── OPTIONS ── */
+    .options { display: flex; flex-direction: column; gap: 0.6rem; }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #dce8dc;
+      border-radius: var(--radius-sm);
+      background: var(--green-50);
+      cursor: pointer;
+      transition: border-color 0.18s, background 0.18s;
+      font-size: 0.9rem;
+      color: var(--text-mid);
+      font-weight: 500;
+      user-select: none;
+    }
+
+    .option-label:hover {
+      border-color: var(--green-400);
+      background: var(--green-100);
+    }
+
+    .option-label input[type="radio"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #b5d6b5;
+      border-radius: 50%;
+      flex-shrink: 0;
+      transition: border-color 0.18s, background 0.18s;
+      position: relative;
+    }
+
+    .option-label input[type="radio"]:checked {
+      border-color: var(--green-500);
+      background: var(--green-500);
+    }
+
+    .option-label input[type="radio"]:checked::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: white;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .option-label:has(input[type="radio"]:checked) {
+      border-color: var(--green-500);
+      background: var(--green-100);
+      color: var(--text-dark);
+    }
+
+    .option-guna-tag {
+      margin-left: auto;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+
+    .tag-sattva { background: #e8f4ff; color: #3a7abd; }
+    .tag-rajas  { background: #fff3e0; color: #c06a10; }
+    .tag-tamas  { background: #f3e8ff; color: #7b3ab4; }
+
+    /* ── ERROR BANNER ── */
+    .error-banner {
+      background: #fff3f3;
+      border: 1px solid #f5c2c2;
+      border-radius: var(--radius-sm);
+      padding: 0.65rem 1rem;
+      font-size: 0.82rem;
+      color: #c0392b;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .error-banner.visible { display: block; }
+
+    /* ── SUBMIT BUTTON ── */
+    .btn-submit {
+      width: 100%;
+      padding: 0.95rem;
+      background: var(--green-500);
+      color: white;
+      border: none;
+      border-radius: 999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(74,160,74,0.3);
+      margin-top: 0.5rem;
+    }
+
+    .btn-submit:hover {
+      background: var(--green-600);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(74,160,74,0.4);
+    }
+
+    .btn-submit:active { transform: translateY(0); }
+
+    /* ── RESULT CARD ── */
+    .result-card {
+      display: none;
+      background: white;
+      border-radius: 20px;
+      padding: 2rem 1.5rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .result-card.visible { display: block; }
+
+    .result-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+
+    .result-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.4rem;
+    }
+
+    .result-guna {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--green-600);
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-desc {
+      font-size: 0.88rem;
+      color: var(--text-mid);
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+    }
+
+    .score-row {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .score-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--green-50);
+      border: 1px solid var(--green-200);
+      border-radius: var(--radius-sm);
+      padding: 0.6rem 1rem;
+      min-width: 70px;
+    }
+
+    .score-chip.dominant {
+      background: var(--green-100);
+      border-color: var(--green-400);
+    }
+
+    .score-chip-name {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .score-chip-val {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--green-600);
+    }
+
+    @media (max-width: 480px) {
+      .greeting { font-size: 1.35rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <span class="logo-leaf">🌿</span>
+        <span class="logo-text">Dincharya</span>
+      </a>
+      <a href="/prakriti.html" class="nav-back">← Back</a>
+    </div>
+  </nav>
+
+  <div class="bg-circle circle-1"></div>
+  <div class="bg-circle circle-2"></div>
+
+  <main>
+    <div class="container">
+
+      <div class="greeting-badge">🌟 Guna Assessment</div>
+      <h1 class="greeting">Namaste, <span id="userName">there</span>! 🙏</h1>
+      <p class="greeting-sub">Answer 8 questions about your mental tendencies to discover your dominant Guna — the quality of your mind and consciousness.</p>
+
+      <div class="progress-wrap">
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-label" id="progressLabel">0 / 8</div>
+      </div>
+
+      <form id="gunaForm" novalidate></form>
+
+      <div class="error-banner" id="errorBanner">
+        ⚠️ Please answer all 8 questions before submitting.
+      </div>
+
+      <div class="result-card" id="resultCard">
+        <div class="result-icon" id="resultIcon"></div>
+        <div class="result-label">Your Dominant Guna</div>
+        <div class="result-guna" id="resultGuna"></div>
+        <p class="result-desc" id="resultDesc"></p>
+        <div class="score-row" id="scoreRow"></div>
+        <button class="btn-submit" id="continueBtn">Go to My Dashboard →</button>
+      </div>
+
+      <button class="btn-submit" id="submitBtn" type="button">Submit →</button>
+
+    </div>
+  </main>
+
+  <script>
+    var questions = [
+      {
+        text: "How would you describe your general mindset?",
+        options: [
+          { label: "Calm, clear, and content — focused on the present",     guna: "Sattva" },
+          { label: "Active and ambitious — always thinking of the next goal", guna: "Rajas"  },
+          { label: "Dull and unmotivated — hard to get started",             guna: "Tamas"  }
+        ]
+      },
+      {
+        text: "How do you spend most of your free time?",
+        options: [
+          { label: "Meditating, reading, or creative activities",  guna: "Sattva" },
+          { label: "Socialising, planning, or staying busy",        guna: "Rajas"  },
+          { label: "Sleeping, watching TV, or doing very little",   guna: "Tamas"  }
+        ]
+      },
+      {
+        text: "How is your emotional state on most days?",
+        options: [
+          { label: "Peaceful, joyful, and equanimous",          guna: "Sattva" },
+          { label: "Restless, eager, or slightly anxious",       guna: "Rajas"  },
+          { label: "Lethargic, indifferent, or frequently low",  guna: "Tamas"  }
+        ]
+      },
+      {
+        text: "When you face a challenge, what is your first reaction?",
+        options: [
+          { label: "Reflect calmly and seek a balanced solution",       guna: "Sattva" },
+          { label: "Jump into action immediately, sometimes impulsively", guna: "Rajas"  },
+          { label: "Feel overwhelmed or avoid dealing with it",          guna: "Tamas"  }
+        ]
+      },
+      {
+        text: "How do you relate to your diet and eating habits?",
+        options: [
+          { label: "Fresh, light, wholesome foods — I eat mindfully",    guna: "Sattva" },
+          { label: "Spicy, stimulating foods — I eat on the go",          guna: "Rajas"  },
+          { label: "Heavy, processed, or leftover foods — I eat without care", guna: "Tamas" }
+        ]
+      },
+      {
+        text: "How do you handle your daily responsibilities?",
+        options: [
+          { label: "With a balanced routine — consistent and unhurried",  guna: "Sattva" },
+          { label: "With urgency — busy, always multi-tasking",            guna: "Rajas"  },
+          { label: "Procrastinating or doing the minimum required",        guna: "Tamas"  }
+        ]
+      },
+      {
+        text: "What best describes your sleep and rest patterns?",
+        options: [
+          { label: "Restful and refreshing — wake up feeling energised",   guna: "Sattva" },
+          { label: "Light and short — mind keeps running even at night",    guna: "Rajas"  },
+          { label: "Excessive — I sleep a lot and still feel tired",         guna: "Tamas"  }
+        ]
+      },
+      {
+        text: "How do you typically feel about helping or giving to others?",
+        options: [
+          { label: "Naturally compassionate — give without expecting return", guna: "Sattva" },
+          { label: "Helpful when there is something in it for me",            guna: "Rajas"  },
+          { label: "Rarely think about it — self-absorbed or indifferent",    guna: "Tamas"  }
+        ]
+      }
+    ];
+
+    var gunaInfo = {
+      Sattva: {
+        icon: "🌟",
+        desc: "Your mind is predominantly Sattvic — clear, harmonious, and peaceful. You tend towards wisdom, compassion, and balance. Nurture this quality through meditation, wholesome food, and purposeful living."
+      },
+      Rajas: {
+        icon: "🔥",
+        desc: "Your mind is predominantly Rajasic — active, ambitious, and restless. You are driven and energetic but may struggle with restlessness or desire. Channel this energy through mindful action and breathwork."
+      },
+      Tamas: {
+        icon: "🌑",
+        desc: "Your mind is predominantly Tamasic — heavy, slow, and inert. This calls for gentle but consistent effort to awaken energy. Sunrise routines, light exercise, and sattvic foods can transform your state gradually."
+      }
+    };
+
+    /* Init name */
+    var storedName = localStorage.getItem('name') || '';
+    if (storedName) {
+      document.getElementById('userName').textContent = storedName.split(' ')[0];
+    }
+
+    var form = document.getElementById('gunaForm');
+    var totalQ = questions.length;
+
+    /* Build questions */
+    questions.forEach(function(q, qi) {
+      var card = document.createElement('div');
+      card.className = 'question-card';
+
+      var num = document.createElement('div');
+      num.className = 'question-number';
+      num.textContent = 'Question ' + (qi + 1) + ' of ' + totalQ;
+
+      var text = document.createElement('div');
+      text.className = 'question-text';
+      text.textContent = q.text;
+
+      var opts = document.createElement('div');
+      opts.className = 'options';
+
+      q.options.forEach(function(opt) {
+        var lbl = document.createElement('label');
+        lbl.className = 'option-label';
+
+        var radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'q' + qi;
+        radio.value = opt.guna;
+        radio.addEventListener('change', updateProgress);
+
+        var span = document.createElement('span');
+        span.textContent = opt.label;
+
+        var tag = document.createElement('span');
+        tag.className = 'option-guna-tag tag-' + opt.guna.toLowerCase();
+        tag.textContent = opt.guna;
+
+        lbl.appendChild(radio);
+        lbl.appendChild(span);
+        lbl.appendChild(tag);
+        opts.appendChild(lbl);
+      });
+
+      card.appendChild(num);
+      card.appendChild(text);
+      card.appendChild(opts);
+      form.appendChild(card);
+    });
+
+    /* Progress */
+    function updateProgress() {
+      var answered = 0;
+      for (var i = 0; i < totalQ; i++) {
+        if (form.querySelector('input[name="q' + i + '"]:checked')) answered++;
+      }
+      var pct = Math.round((answered / totalQ) * 100);
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressLabel').textContent = answered + ' / ' + totalQ;
+      if (answered > 0) {
+        document.getElementById('errorBanner').classList.remove('visible');
+      }
+    }
+
+    /* Submit */
+    document.getElementById('submitBtn').addEventListener('click', function() {
+      var scores = { Sattva: 0, Rajas: 0, Tamas: 0 };
+      var allAnswered = true;
+
+      for (var i = 0; i < totalQ; i++) {
+        var checked = form.querySelector('input[name="q' + i + '"]:checked');
+        if (!checked) {
+          allAnswered = false;
+        } else {
+          scores[checked.value]++;
+        }
+      }
+
+      if (!allAnswered) {
+        document.getElementById('errorBanner').classList.add('visible');
+        form.querySelector('.question-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+
+      var dominant = Object.keys(scores).reduce(function(a, b) {
+        return scores[a] >= scores[b] ? a : b;
+      });
+
+      localStorage.setItem('guna', dominant);
+
+      var info = gunaInfo[dominant];
+      document.getElementById('resultIcon').textContent = info.icon;
+      document.getElementById('resultGuna').textContent = dominant;
+      document.getElementById('resultDesc').textContent = info.desc;
+
+      var scoreRow = document.getElementById('scoreRow');
+      scoreRow.innerHTML = '';
+      ['Sattva', 'Rajas', 'Tamas'].forEach(function(g) {
+        var chip = document.createElement('div');
+        chip.className = 'score-chip' + (g === dominant ? ' dominant' : '');
+        chip.innerHTML = '<span class="score-chip-name">' + g + '</span><span class="score-chip-val">' + scores[g] + '</span>';
+        scoreRow.appendChild(chip);
+      });
+
+      form.style.display = 'none';
+      document.getElementById('submitBtn').style.display = 'none';
+      document.getElementById('errorBanner').classList.remove('visible');
+      document.getElementById('resultCard').classList.add('visible');
+      document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    document.getElementById('continueBtn').addEventListener('click', function() {
+      window.location.href = '/dashboard.html';
+    });
+
+    updateProgress();
+  </script>
+
+</body>
+</html>

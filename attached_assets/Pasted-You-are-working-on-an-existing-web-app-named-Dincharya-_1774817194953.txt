@@ -1,0 +1,107 @@
+You are working on an existing web app named "Dincharya" built using HTML, CSS, and JavaScript.
+
+CONTEXT:
+- Previous pages are completed:
+  signup.html → prakriti.html
+- Data already stored in localStorage:
+  - "name"
+  - "age"
+  - "goal"
+  - "email"
+  - "prakriti"
+
+FLOW:
+signup.html → prakriti.html → guna.html → dashboard.html
+
+--------------------------------------------------
+
+TASK: CREATE GUNA PAGE (guna.html)
+
+1. UI REQUIREMENTS:
+- Maintain same theme:
+  - Soft green + beige colors
+  - Rounded cards
+  - Mobile layout (max-width ~380px)
+- Clean and minimal design
+
+--------------------------------------------------
+
+2. GREETING:
+- Fetch user's name:
+  localStorage.getItem("name")
+
+- Display:
+  "Namaste, [User Name]"
+
+--------------------------------------------------
+
+3. GUNA TEST (CORE FEATURE):
+
+Create 6–8 MCQ questions.
+
+Each question must have 3 options:
+- Sattva (calm, clarity)
+- Rajas (active, restless)
+- Tamas (lazy, dull)
+
+Example Questions:
+- Your mindset:
+  - Calm & focused → Sattva
+  - Energetic & restless → Rajas
+  - Lazy & inactive → Tamas
+
+- Your daily behavior:
+  - Balanced → Sattva
+  - Busy & overthinking → Rajas
+  - Slow & inactive → Tamas
+
+--------------------------------------------------
+
+4. SCORING LOGIC:
+
+- Initialize:
+  sattva = 0
+  rajas = 0
+  tamas = 0
+
+- For each selected option:
+  increase respective score
+
+- After submission:
+  - Find highest score
+  - Determine dominant Guna
+
+--------------------------------------------------
+
+5. STORE RESULT:
+
+Save in localStorage:
+- key: "guna"
+- value: "Sattva" / "Rajas" / "Tamas"
+
+--------------------------------------------------
+
+6. REDIRECT (FINAL STEP):
+
+After submission:
+- Redirect to:
+  window.location.href = "./dashboard.html";
+
+--------------------------------------------------
+
+7. VALIDATION:
+- Ensure all questions are answered before submission
+
+--------------------------------------------------
+
+STRICT RULES:
+- Do NOT break UI consistency
+- Do NOT change previous flow
+- Keep code clean and simple
+- No frameworks
+
+--------------------------------------------------
+
+OUTPUT:
+- Provide FULL code for guna.html (HTML + CSS + JS)
+- No explanation
