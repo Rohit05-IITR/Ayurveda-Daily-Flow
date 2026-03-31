@@ -393,40 +393,47 @@
           <span class="error-msg" id="goalError">Please select a wellness goal.</span>
         </div>
 
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Create a password" autocomplete="new-password" />
+          <span class="error-msg" id="passwordError">Password must be at least 6 characters.</span>
+        </div>
+
         <button type="button" class="btn-continue" id="continueBtn">
-          Continue →
+          Create Account →
         </button>
 
       </form>
 
       <div class="divider">or</div>
-      <p class="signin-link">Already have an account? <a href="#">Sign in</a></p>
+      <p class="signin-link">Already have an account? <a href="/login.html">Sign in</a></p>
     </div>
   </main>
 
   <script>
-    var continueBtn = document.getElementById('continueBtn');
+    var continueBtn   = document.getElementById('continueBtn');
+    var nameInput     = document.getElementById('name');
+    var emailInput    = document.getElementById('email');
+    var ageInput      = document.getElementById('age');
+    var goalInput     = document.getElementById('goal');
+    var passwordInput = document.getElementById('password');
 
-    var nameInput  = document.getElementById('name');
-    var emailInput = document.getElementById('email');
-    var ageInput   = document.getElementById('age');
-    var goalInput  = document.getElementById('goal');
-
-    var nameError  = document.getElementById('nameError');
-    var emailError = document.getElementById('emailError');
-    var ageError   = document.getElementById('ageError');
-    var goalError  = document.getElementById('goalError');
-    var globalAlert = document.getElementById('globalAlert');
+    var nameError     = document.getElementById('nameError');
+    var emailError    = document.getElementById('emailError');
+    var ageError      = document.getElementById('ageError');
+    var goalError     = document.getElementById('goalError');
+    var passwordError = document.getElementById('passwordError');
+    var globalAlert   = document.getElementById('globalAlert');
 
     function isValidEmail(val) {
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
     }
 
     function clearErrors() {
-      [nameInput, emailInput, ageInput, goalInput].forEach(function(el) {
+      [nameInput, emailInput, ageInput, goalInput, passwordInput].forEach(function(el) {
         el.classList.remove('input-error');
       });
-      [nameError, emailError, ageError, goalError].forEach(function(el) {
+      [nameError, emailError, ageError, goalError, passwordError].forEach(function(el) {
         el.classList.remove('visible');
       });
       globalAlert.classList.remove('visible');
@@ -437,59 +444,85 @@
       clearErrors();
       var valid = true;
 
-      var name  = nameInput.value.trim();
-      var email = emailInput.value.trim();
-      var age   = ageInput.value.trim();
-      var goal  = goalInput.value;
-
-      if (!name) {
+      if (!nameInput.value.trim()) {
         nameInput.classList.add('input-error');
         nameError.classList.add('visible');
         valid = false;
       }
 
-      if (!email || !isValidEmail(email)) {
+      if (!emailInput.value.trim() || !isValidEmail(emailInput.value.trim())) {
         emailInput.classList.add('input-error');
         emailError.classList.add('visible');
         valid = false;
       }
 
-      if (!age || isNaN(Number(age)) || Number(age) < 1 || Number(age) > 120) {
+      var age = Number(ageInput.value.trim());
+      if (!ageInput.value.trim() || isNaN(age) || age < 1 || age > 120) {
         ageInput.classList.add('input-error');
         ageError.classList.add('visible');
         valid = false;
       }
 
-      if (!goal) {
+      if (!goalInput.value) {
         goalInput.classList.add('input-error');
         goalError.classList.add('visible');
+        valid = false;
+      }
+
+      if (!passwordInput.value || passwordInput.value.length < 6) {
+        passwordInput.classList.add('input-error');
+        passwordError.classList.add('visible');
         valid = false;
       }
 
       return valid;
     }
 
-    continueBtn.addEventListener('click', function() {
+    continueBtn.addEventListener('click', async function() {
       if (!validate()) return;
 
-      var name  = nameInput.value.trim();
-      var email = emailInput.value.trim();
-      var age   = ageInput.value.trim();
-      var goal  = goalInput.value;
+      continueBtn.disabled = true;
+      continueBtn.textContent = 'Creating account…';
+
+      var name     = nameInput.value.trim();
+      var email    = emailInput.value.trim();
+      var age      = Number(ageInput.value.trim());
+      var goal     = goalInput.value;
+      var password = passwordInput.value;
 
       try {
+        var res = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, age, email, goal, password })
+        });
+
+        var data = await res.json();
+
+        if (!res.ok) {
+          globalAlert.textContent = '⚠️ ' + (data.message || 'Registration failed. Please try again.');
+          globalAlert.classList.add('visible');
+          continueBtn.disabled = false;
+          continueBtn.textContent = 'Create Account →';
+          return;
+        }
+
+        /* Save to localStorage then proceed to assessments */
         localStorage.setItem('name',  name);
         localStorage.setItem('email', email);
-        localStorage.setItem('age',   age);
+        localStorage.setItem('age',   String(age));
         localStorage.setItem('goal',  goal);
+
         window.location.href = '/prakriti.html';
+
       } catch (err) {
-        globalAlert.textContent = 'Something went wrong. Please try again.';
+        globalAlert.textContent = '⚠️ Network error. Please check your connection.';
         globalAlert.classList.add('visible');
+        continueBtn.disabled = false;
+        continueBtn.textContent = 'Create Account →';
       }
     });
 
-    /* Live clear on correction */
     nameInput.addEventListener('input', function() {
       if (nameInput.value.trim()) {
         nameInput.classList.remove('input-error');
@@ -516,6 +549,13 @@
       if (goalInput.value) {
         goalInput.classList.remove('input-error');
         goalError.classList.remove('visible');
+      }
+    });
+
+    passwordInput.addEventListener('input', function() {
+      if (passwordInput.value.length >= 6) {
+        passwordInput.classList.remove('input-error');
+        passwordError.classList.remove('visible');
       }
     });
   </script>

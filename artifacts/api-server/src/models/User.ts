@@ -5,6 +5,7 @@ export interface IUser extends Document {
   age: number;
   email: string;
   goal: string;
+  password: string;
   prakriti: string;
   guna: string;
 }
@@ -13,10 +14,11 @@ const UserSchema = new Schema<IUser>(
   {
     name:     { type: String, required: true },
     age:      { type: Number, required: true },
-    email:    { type: String, required: true },
+    email:    { type: String, required: true, unique: true },
     goal:     { type: String, required: true },
-    prakriti: { type: String, required: true },
-    guna:     { type: String, required: true },
+    password: { type: String, required: true },
+    prakriti: { type: String, default: "" },
+    guna:     { type: String, default: "" },
   },
   { timestamps: true },
 );

@@ -1,0 +1,105 @@
+You are given an existing full-stack project named "Dincharya" with:
+- Frontend (HTML/CSS/JS)
+- Backend (Node.js, Express, MongoDB)
+
+Currently:
+- Users are saved without authentication
+- Signup and login are not separated properly
+
+--------------------------------------------------
+
+TASK: IMPLEMENT PROPER AUTHENTICATION SYSTEM
+
+--------------------------------------------------
+
+1. UPDATE USER SCHEMA:
+
+Add:
+- password (String, required)
+
+Ensure email is UNIQUE:
+email: { type: String, unique: true }
+
+--------------------------------------------------
+
+2. CREATE REGISTER API:
+
+POST /register
+
+Functionality:
+- Accept:
+  name, age, email, goal, password
+
+- Check:
+  If email already exists:
+    → return error "User already exists"
+
+- Else:
+  Save new user
+
+- Return success message
+
+--------------------------------------------------
+
+3. CREATE LOGIN API:
+
+POST /login
+
+Functionality:
+- Accept:
+  email, password
+
+- Check:
+  If user not found:
+    → return "User not found"
+
+- If password incorrect:
+    → return "Invalid password"
+
+- Else:
+    → return user data (name, email, goal, prakriti, guna)
+
+--------------------------------------------------
+
+4. FRONTEND CHANGES:
+
+A. Signup Page:
+- Add password input field
+- On submit:
+  call /register API
+
+B. Login Page:
+- Only ask:
+  - Email
+  - Password
+
+- On submit:
+  call /login API
+
+- On success:
+  store user data in localStorage
+  redirect to dashboard.html
+
+--------------------------------------------------
+
+5. VALIDATION:
+
+- Prevent duplicate email registration
+- Validate email format
+- Password should not be empty
+
+--------------------------------------------------
+
+6. STRICT RULES:
+
+- Do NOT break existing UI
+- Only modify necessary parts
+- Keep code clean
+- Do NOT use frameworks like React
+
+--------------------------------------------------
+
+OUTPUT:
+- Updated backend code (server.js)
+- Required frontend JS changes
+- No explanation
