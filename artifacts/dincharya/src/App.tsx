@@ -4,6 +4,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
+import Signup from "@/pages/Signup";
+import Login from "@/pages/Login";
+import Prakriti from "@/pages/Prakriti";
+import Guna from "@/pages/Guna";
+import Dashboard from "@/pages/Dashboard";
 import "./dincharya.css";
 
 const queryClient = new QueryClient();
@@ -11,7 +16,12 @@ const queryClient = new QueryClient();
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
+      <Route path="/"          component={Home}      />
+      <Route path="/signup"    component={Signup}    />
+      <Route path="/login"     component={Login}     />
+      <Route path="/prakriti"  component={Prakriti}  />
+      <Route path="/guna"      component={Guna}      />
+      <Route path="/dashboard" component={Dashboard} />
       <Route component={NotFound} />
     </Switch>
   );

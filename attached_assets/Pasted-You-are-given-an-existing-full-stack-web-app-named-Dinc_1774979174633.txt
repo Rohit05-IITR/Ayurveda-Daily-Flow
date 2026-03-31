@@ -1,0 +1,161 @@
+You are given an existing full-stack web app named "Dincharya".
+
+Current Tech:
+- Frontend: HTML, CSS, JavaScript (multiple pages)
+- Backend: Node.js + Express + MongoDB (already working)
+
+Goal:
+Convert the ENTIRE frontend into a React application WITHOUT breaking existing functionality.
+
+--------------------------------------------------
+
+EXISTING FLOW:
+signup.html → prakriti.html → guna.html → dashboard.html
+
+Data handled via:
+- localStorage
+- fetch API to backend
+
+--------------------------------------------------
+
+TASK: CONVERT FRONTEND TO REACT
+
+--------------------------------------------------
+
+1. SETUP REACT PROJECT
+
+- Use Vite for setup:
+  npm create vite@latest dincharya-frontend --template react
+  cd dincharya-frontend
+  npm install
+
+- Install:
+  npm install react-router-dom
+
+--------------------------------------------------
+
+2. CREATE FOLDER STRUCTURE
+
+/src
+  /components
+  /pages
+    Signup.jsx
+    Login.jsx
+    Prakriti.jsx
+    Guna.jsx
+    Dashboard.jsx
+  /services
+    api.js
+  App.jsx
+  main.jsx
+
+--------------------------------------------------
+
+3. SETUP ROUTING (IMPORTANT)
+
+Use react-router-dom:
+
+Routes:
+- "/" → Signup
+- "/login" → Login
+- "/prakriti" → Prakriti
+- "/guna" → Guna
+- "/dashboard" → Dashboard
+
+--------------------------------------------------
+
+4. CONVERT EACH PAGE
+
+Convert existing HTML pages into React components:
+
+A. Signup.jsx
+- Inputs: name, email, age, goal, password
+- On submit:
+  call backend /register API
+- On success:
+  navigate to /prakriti
+
+B. Login.jsx
+- Inputs: email, password
+- Call /login API
+- Store user data in localStorage
+- Navigate to /dashboard
+
+C. Prakriti.jsx
+- Same questions
+- Store result in localStorage
+- Navigate to /guna
+
+D. Guna.jsx
+- Same logic
+- After submit:
+  call backend to update user
+  navigate to /dashboard
+
+E. Dashboard.jsx
+- Fetch user data from backend
+- Show:
+  - name
+  - prakriti
+  - guna
+  - goal
+- Show Dinacharya score
+- Input daily data
+
+--------------------------------------------------
+
+5. API SERVICE FILE
+
+Create /services/api.js:
+
+- Base URL: http://localhost:5000
+- Functions:
+  registerUser()
+  loginUser()
+  saveUserData()
+  getUser()
+
+Use fetch or axios
+
+--------------------------------------------------
+
+6. STATE MANAGEMENT
+
+- Use useState for form inputs
+- Use useEffect for fetching data
+- Store user email or id in localStorage
+
+--------------------------------------------------
+
+7. UI DESIGN
+
+- Reuse existing CSS
+- Convert class → className
+- Maintain same theme (green, rounded cards)
+
+--------------------------------------------------
+
+8. NAVIGATION
+
+- Use useNavigate() instead of window.location.href
+
+--------------------------------------------------
+
+STRICT RULES:
+
+- Do NOT change backend
+- Do NOT remove logic (prakriti/guna scoring)
+- Only convert structure to React
+- Keep code clean and modular
+
+--------------------------------------------------
+
+OUTPUT:
+
+Provide:
+1. Step-by-step setup commands
+2. App.jsx with routing
+3. Example of 1–2 pages fully converted (Signup + Dashboard)
+4. API service file
+
+No explanation

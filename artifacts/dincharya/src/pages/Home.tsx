@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
 
 export default function Home() {
+  const [, navigate] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -23,7 +25,11 @@ export default function Home() {
             <li><a href="#home" onClick={() => setMenuOpen(false)}>Home</a></li>
             <li><a href="#features" onClick={() => setMenuOpen(false)}>Features</a></li>
             <li>
-              <a href="signup.html" className="nav-cta" onClick={() => setMenuOpen(false)}>
+              <a
+                href="/signup"
+                className="nav-cta"
+                onClick={(e) => { e.preventDefault(); setMenuOpen(false); navigate("/signup"); }}
+              >
                 Get Started
               </a>
             </li>
@@ -54,10 +60,10 @@ export default function Home() {
             Align your lifestyle with ancient wisdom and modern data
           </p>
           <div className="hero-buttons">
-            <a href="signup.html" className="btn btn-primary">
+            <a href="/signup" className="btn btn-primary" onClick={(e) => { e.preventDefault(); navigate("/signup"); }}>
               Get Started →
             </a>
-            <a href="prakriti.html" className="btn btn-outline">
+            <a href="/prakriti" className="btn btn-outline" onClick={(e) => { e.preventDefault(); navigate("/prakriti"); }}>
               🔬 Take Prakriti Test
             </a>
           </div>
@@ -189,7 +195,7 @@ export default function Home() {
               <p className="iks-description">
                 Ayurveda, one of the world's oldest healing systems, teaches that true health comes from living in harmony with nature's rhythms. <strong>Prakriti</strong> is your unique body-mind constitution — a blend of Vata, Pitta, and Kapha doshas — that shapes your physiology, personality, and susceptibilities. <strong>Dinacharya</strong> is the Ayurvedic daily regimen designed to align your body clock with cosmic cycles, promoting vitality, clarity, and longevity.
               </p>
-              <a href="prakriti.html" className="btn btn-primary" style={{ display: "inline-block", marginTop: "1.5rem" }}>
+              <a href="/prakriti" className="btn btn-primary" style={{ display: "inline-block", marginTop: "1.5rem" }} onClick={(e) => { e.preventDefault(); navigate("/prakriti"); }}>
                 Discover Your Prakriti →
               </a>
             </div>
@@ -222,7 +228,7 @@ export default function Home() {
           <p className="cta-subtitle">
             Join thousands who have transformed their daily lives with Ayurvedic wisdom
           </p>
-          <a href="signup.html" className="btn btn-white">
+          <a href="/signup" className="btn btn-white" onClick={(e) => { e.preventDefault(); navigate("/signup"); }}>
             Start Now — It's Free →
           </a>
         </div>
@@ -239,8 +245,8 @@ export default function Home() {
           <div className="footer-links">
             <a href="#home">Home</a>
             <a href="#features">Features</a>
-            <a href="prakriti.html">Prakriti Test</a>
-            <a href="signup.html">Sign Up</a>
+            <a href="/prakriti" onClick={(e) => { e.preventDefault(); navigate("/prakriti"); }}>Prakriti Test</a>
+            <a href="/signup" onClick={(e) => { e.preventDefault(); navigate("/signup"); }}>Sign Up</a>
           </div>
           <p className="footer-copy">© 2025 Dincharya · Built with ❤️ and Ayurveda</p>
         </div>
