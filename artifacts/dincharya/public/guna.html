@@ -623,6 +623,24 @@
 
       localStorage.setItem('guna', dominant);
 
+      /* ── SAVE USER TO MONGODB ── */
+      var payload = {
+        name:     localStorage.getItem('name')     || '',
+        age:      parseInt(localStorage.getItem('age') || '0', 10),
+        email:    localStorage.getItem('email')    || '',
+        goal:     localStorage.getItem('goal')     || '',
+        prakriti: localStorage.getItem('prakriti') || '',
+        guna:     dominant
+      };
+
+      fetch('/api/saveUser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch(function(err) {
+        console.warn('Could not save user to server:', err);
+      });
+
       var info = gunaInfo[dominant];
       document.getElementById('resultIcon').textContent = info.icon;
       document.getElementById('resultGuna').textContent = dominant;
