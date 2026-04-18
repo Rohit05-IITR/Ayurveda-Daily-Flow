@@ -1,22 +1,7 @@
 import { useEffect, useState } from "react";
-import { getDietPlan } from "../lib/diet";
 import "../pages.css";
 
-const FOOD_DB: Record<string, { cal: number; protein: number; carbs: number; fats: number }> = {
-  rice:    { cal: 130, protein: 2.7, carbs: 28,   fats: 0.3 },
-  egg:     { cal: 78,  protein: 6,   carbs: 0.6,  fats: 5   },
-  paneer:  { cal: 265, protein: 18,  carbs: 3,    fats: 20  },
-  milk:    { cal: 42,  protein: 3.4, carbs: 5,    fats: 1   },
-  dal:     { cal: 116, protein: 9,   carbs: 20,   fats: 0.4 },
-  roti:    { cal: 104, protein: 3.5, carbs: 18,   fats: 2.8 },
-  banana:  { cal: 89,  protein: 1.1, carbs: 23,   fats: 0.3 },
-  yogurt:  { cal: 61,  protein: 3.5, carbs: 4.7,  fats: 3.3 },
-  chicken: { cal: 165, protein: 31,  carbs: 0,    fats: 3.6 },
-  oats:    { cal: 71,  protein: 2.5, carbs: 12,   fats: 1.5 },
-  ghee:    { cal: 112, protein: 0,   carbs: 0,    fats: 12.7},
-  apple:   { cal: 52,  protein: 0.3, carbs: 14,   fats: 0.2 },
-};
-
+/* ── Types ── */
 interface FoodEntry {
   name: string;
   qty: number;
@@ -26,7 +11,21 @@ interface FoodEntry {
   fats: number;
 }
 
-interface DailyData { wakeTime: string; sleepTime: string; mealTime: string; screenTime: string; }
+interface AiPlan {
+  title: string;
+  prakriti: string;
+  eat: string[];
+  avoid: string[];
+  lifestyle: string[];
+  calorieAdvice: string;
+}
+
+interface DailyData {
+  wakeTime: string;
+  sleepTime: string;
+  mealTime: string;
+  screenTime: string;
+}
 
 function streakBadge(n: number) {
   if (n >= 30) return "MASTER";
@@ -48,59 +47,123 @@ export default function Dashboard() {
   const firstName     = name.split(" ")[0] || "";
   const goalShort     = goal.length > 10 ? goal.split(" ")[0] : goal;
 
-  const diet = getDietPlan(prakritiType || prakriti);
-
+  /* ── Streak & score ── */
   const [streak, setStreak] = useState(parseInt(localStorage.getItem("streak") || "0", 10));
   const [toast,  setToast]  = useState(false);
   const [barW,   setBarW]   = useState("0%");
-  const [daily,  setDaily]  = useState<DailyData>(() => {
+
+  /* ── Daily log ── */
+  const [daily, setDaily] = useState<DailyData>(() => {
     const s = JSON.parse(localStorage.getItem("dailyData") || "{}");
-    return { wakeTime: s.wakeTime || "", sleepTime: s.sleepTime || "", mealTime: s.mealTime || "", screenTime: s.screenTime || "" };
+    return {
+      wakeTime:   s.wakeTime   || "",
+      sleepTime:  s.sleepTime  || "",
+      mealTime:   s.mealTime   || "",
+      screenTime: s.screenTime || "",
+    };
   });
 
-  // Calorie tracker state
-  const [foodQuery,    setFoodQuery]    = useState("");
-  const [foodQty,      setFoodQty]      = useState(1);
-  const [foodLog,      setFoodLog]      = useState<FoodEntry[]>([]);
-  const [foodError,    setFoodError]    = useState("");
-  const [calorieToast, setCalorieToast] = useState("");
+  /* ── Calorie tracker ── */
+  const [foodQuery,   setFoodQuery]   = useState("");
+  const [foodQty,     setFoodQty]     = useState(1);
+  const [foodLog,     setFoodLog]     = useState<FoodEntry[]>([]);
+  const [foodError,   setFoodError]   = useState("");
+  const [foodLoading, setFoodLoading] = useState(false);
+
+  /* ── AI diet plan ── */
+  const [aiPlan,    setAiPlan]    = useState<AiPlan | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setBarW("78%"), 300);
     return () => clearTimeout(t);
   }, []);
 
+  /* ── Derived totals ── */
   const totalCal     = foodLog.reduce((s, f) => s + f.cal, 0);
   const totalProtein = foodLog.reduce((s, f) => s + f.protein, 0);
   const totalCarbs   = foodLog.reduce((s, f) => s + f.carbs, 0);
   const totalFats    = foodLog.reduce((s, f) => s + f.fats, 0);
   const remaining    = dailyCalories ? dailyCalories - totalCal : null;
 
-  function addFood() {
-    const key = foodQuery.trim().toLowerCase();
-    const entry = FOOD_DB[key];
-    if (!entry) {
-      setFoodError(`"${foodQuery}" not found. Try: ${Object.keys(FOOD_DB).join(", ")}.`);
-      return;
-    }
+  /* ── CalorieNinjas API ── */
+  async function addFood() {
+    const query = foodQuery.trim();
+    if (!query) return;
+
+    setFoodLoading(true);
     setFoodError("");
-    const qty = Math.max(0.1, foodQty);
-    setFoodLog(log => [...log, {
-      name: key,
-      qty,
-      cal:     Math.round(entry.cal     * qty),
-      protein: Math.round(entry.protein * qty * 10) / 10,
-      carbs:   Math.round(entry.carbs   * qty * 10) / 10,
-      fats:    Math.round(entry.fats    * qty * 10) / 10,
-    }]);
-    setFoodQuery("");
-    setFoodQty(1);
+
+    try {
+      const res  = await fetch(`/api/nutrition?food=${encodeURIComponent(query)}`);
+      const data = await res.json() as { items?: { name: string; calories: number; protein_g: number; carbohydrates_total_g: number; fat_total_g: number; serving_size_g: number }[] };
+
+      if (!res.ok || !data.items || data.items.length === 0) {
+        setFoodError(`"${query}" not found. Try a different food name.`);
+        alert("❌ Food not found. Please try a more specific name (e.g. '100g rice').");
+        return;
+      }
+
+      const item = data.items[0];
+      const scale = foodQty; // qty treated as serving multiplier
+
+      setFoodLog(log => [...log, {
+        name:    item.name,
+        qty:     foodQty,
+        cal:     Math.round(item.calories     * scale),
+        protein: Math.round(item.protein_g    * scale * 10) / 10,
+        carbs:   Math.round(item.carbohydrates_total_g * scale * 10) / 10,
+        fats:    Math.round(item.fat_total_g  * scale * 10) / 10,
+      }]);
+
+      alert(`✅ Nutrition data fetched for "${item.name}"`);
+      setFoodQuery("");
+      setFoodQty(1);
+    } catch {
+      setFoodError("Network error. Please try again.");
+      alert("❌ Failed to fetch nutrition. Check your connection.");
+    } finally {
+      setFoodLoading(false);
+    }
   }
 
   function removeFood(i: number) {
     setFoodLog(log => log.filter((_, idx) => idx !== i));
   }
 
+  /* ── Gemini AI diet plan ── */
+  async function generateDietPlan() {
+    setAiLoading(true);
+    try {
+      const res = await fetch("/api/diet-plan", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prakritiType:     prakritiType || prakriti || "Vata-Pitta",
+          goal:             healthGoal || goal || "General Wellness",
+          bmi:              bmi || "—",
+          dailyCalories,
+          consumedCalories: totalCal,
+        }),
+      });
+
+      const data = await res.json() as AiPlan & { error?: string };
+
+      if (!res.ok || data.error) {
+        alert("❌ Failed to generate diet plan. Please try again.");
+        return;
+      }
+
+      setAiPlan(data);
+      alert("✅ AI Diet Plan Generated!");
+    } catch {
+      alert("❌ Failed to generate diet plan. Check your connection.");
+    } finally {
+      setAiLoading(false);
+    }
+  }
+
+  /* ── Daily log save ── */
   function setField(field: keyof DailyData, value: string) {
     setDaily(d => ({ ...d, [field]: value }));
   }
@@ -172,14 +235,18 @@ export default function Dashboard() {
                       className="cal-prog-fill"
                       style={{
                         width: `${Math.min((totalCal / dailyCalories) * 100, 100)}%`,
-                        background: remaining !== null && remaining < 0 ? "#e05252" : "var(--green-500)"
+                        background: remaining !== null && remaining < 0 ? "#e05252" : "var(--green-500)",
                       }}
                     />
                   </div>
                   <div className="cal-target-row" style={{ marginTop: "0.4rem" }}>
                     <span style={{ fontSize: "0.78rem", color: "var(--text-light)" }}>{totalCal} consumed</span>
                     <span style={{ fontSize: "0.82rem", fontWeight: 700, color: remaining !== null && remaining < 0 ? "#d64444" : "var(--green-600)" }}>
-                      {remaining !== null ? (remaining >= 0 ? `${remaining} remaining` : `${Math.abs(remaining)} over`) : ""}
+                      {remaining !== null
+                        ? remaining >= 0
+                          ? `${remaining} remaining`
+                          : `${Math.abs(remaining)} over target`
+                        : ""}
                     </span>
                   </div>
                 </div>
@@ -190,35 +257,43 @@ export default function Dashboard() {
                 <div className="cal-input-wrap">
                   <input
                     type="text"
-                    placeholder="Food name (e.g. rice, egg, dal)"
+                    placeholder="e.g. 100g rice, 2 eggs, 1 cup dal"
                     value={foodQuery}
                     onChange={e => { setFoodQuery(e.target.value); setFoodError(""); }}
-                    onKeyDown={e => e.key === "Enter" && addFood()}
-                    list="food-options"
+                    onKeyDown={e => e.key === "Enter" && !foodLoading && addFood()}
                     className="cal-food-input"
+                    disabled={foodLoading}
                   />
-                  <datalist id="food-options">
-                    {Object.keys(FOOD_DB).map(f => <option key={f} value={f} />)}
-                  </datalist>
                 </div>
                 <input
-                  type="number" min={0.1} step={0.5}
+                  type="number"
+                  min={0.5}
+                  step={0.5}
                   value={foodQty}
                   onChange={e => setFoodQty(Number(e.target.value))}
                   className="cal-qty-input"
-                  title="Servings"
+                  title="Serving multiplier"
+                  disabled={foodLoading}
                 />
-                <button className="cal-add-btn" onClick={addFood}>+ Add</button>
+                <button
+                  className="cal-add-btn"
+                  onClick={addFood}
+                  disabled={foodLoading || !foodQuery.trim()}
+                >
+                  {foodLoading ? "…" : "+ Add"}
+                </button>
               </div>
               {foodError && <p className="cal-error">{foodError}</p>}
 
               {/* Food log */}
-              {foodLog.length > 0 && (
+              {foodLog.length > 0 ? (
                 <>
                   <div className="cal-log">
                     {foodLog.map((entry, i) => (
                       <div key={i} className="cal-log-row">
-                        <span className="cal-food-name">{entry.name} <span className="cal-qty">×{entry.qty}</span></span>
+                        <span className="cal-food-name">
+                          {entry.name} <span className="cal-qty">×{entry.qty}</span>
+                        </span>
                         <div className="cal-macros">
                           <span className="macro macro-cal">{entry.cal} kcal</span>
                           <span className="macro macro-p">P {entry.protein}g</span>
@@ -229,8 +304,6 @@ export default function Dashboard() {
                       </div>
                     ))}
                   </div>
-
-                  {/* Totals */}
                   <div className="cal-totals">
                     <div className="cal-total-box">
                       <span className="cal-total-num">{totalCal}</span>
@@ -250,10 +323,10 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </>
-              )}
-
-              {foodLog.length === 0 && (
-                <p className="cal-empty">No meals logged yet. Search and add your first meal above.</p>
+              ) : (
+                <p className="cal-empty">
+                  No meals logged yet. Try typing "100g rice" or "2 eggs" above.
+                </p>
               )}
             </div>
 
@@ -279,7 +352,14 @@ export default function Dashboard() {
                   </div>
                   <div className="db-field">
                     <label>Screen Time (hrs)</label>
-                    <input type="number" min={0} max={24} placeholder="e.g. 3" value={daily.screenTime} onChange={e => setField("screenTime", e.target.value)} />
+                    <input
+                      type="number"
+                      min={0}
+                      max={24}
+                      placeholder="e.g. 3"
+                      value={daily.screenTime}
+                      onChange={e => setField("screenTime", e.target.value)}
+                    />
                   </div>
                 </div>
               </div>
@@ -325,43 +405,105 @@ export default function Dashboard() {
               <div className="db-profile-grid">
                 <div className="db-chip">
                   <div className="db-chip-label">Prakriti</div>
-                  <div className="db-chip-value" style={{ fontSize: prakritiType && prakritiType.includes("-") ? "0.78rem" : "0.92rem" }}>
+                  <div
+                    className="db-chip-value"
+                    style={{ fontSize: prakritiType?.includes("-") ? "0.78rem" : "0.92rem" }}
+                  >
                     {prakritiType || prakriti || "—"}
                   </div>
                 </div>
-                <div className="db-chip"><div className="db-chip-label">Guna</div><div className="db-chip-value">{guna || "—"}</div></div>
-                <div className="db-chip"><div className="db-chip-label">Goal</div><div className="db-chip-value">{goalShort || "—"}</div></div>
+                <div className="db-chip">
+                  <div className="db-chip-label">Guna</div>
+                  <div className="db-chip-value">{guna || "—"}</div>
+                </div>
+                <div className="db-chip">
+                  <div className="db-chip-label">Goal</div>
+                  <div className="db-chip-value">{goalShort || "—"}</div>
+                </div>
               </div>
               {bmi && (
                 <div style={{ marginTop: "0.75rem", display: "flex", gap: "0.5rem" }}>
-                  <div className="db-chip" style={{ flex: 1 }}><div className="db-chip-label">BMI</div><div className="db-chip-value">{bmi}</div></div>
-                  {healthGoal && <div className="db-chip" style={{ flex: 2 }}><div className="db-chip-label">Health Goal</div><div className="db-chip-value" style={{ fontSize: "0.78rem" }}>{healthGoal}</div></div>}
+                  <div className="db-chip" style={{ flex: 1 }}>
+                    <div className="db-chip-label">BMI</div>
+                    <div className="db-chip-value">{bmi}</div>
+                  </div>
+                  {healthGoal && (
+                    <div className="db-chip" style={{ flex: 2 }}>
+                      <div className="db-chip-label">Health Goal</div>
+                      <div className="db-chip-value" style={{ fontSize: "0.78rem" }}>{healthGoal}</div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
 
-            {/* IKS DIET PLAN */}
+            {/* AI DIET PLAN */}
             <div className="db-card">
               <div className="db-card-label">Personalized IKS Diet Plan</div>
-              <div className="db-diet-header">
-                <span className="db-diet-icon">{diet.icon}</span>
-                <span className="db-section-title">{diet.title}</span>
-                <span className="db-diet-dosha">{prakritiType || prakriti || "General"}</span>
-              </div>
 
-              <div className="iks-diet-section">
-                <div className="iks-diet-heading iks-eat-head">✅ Eat</div>
-                <ul className="db-diet-list">
-                  {diet.eat.map(item => <li key={item}>{item}</li>)}
-                </ul>
-              </div>
+              {!aiPlan ? (
+                <div className="ai-plan-empty">
+                  <div className="ai-plan-icon">🤖</div>
+                  <p className="ai-plan-hint">
+                    Get a personalised Ayurvedic diet plan generated by AI — tailored to your Prakriti, BMI, goal, and today's nutrition.
+                  </p>
+                  <button
+                    className="ai-gen-btn"
+                    onClick={generateDietPlan}
+                    disabled={aiLoading}
+                  >
+                    {aiLoading
+                      ? <><span className="ai-spinner" /> Generating…</>
+                      : "✨ Generate AI Plan"}
+                  </button>
+                </div>
+              ) : (
+                <div className="ai-plan-result">
+                  <div className="ai-plan-title-row">
+                    <div>
+                      <div className="ai-plan-theme">{aiPlan.title}</div>
+                      <span className="db-diet-dosha">{aiPlan.prakriti}</span>
+                    </div>
+                    <button
+                      className="ai-regen-btn"
+                      onClick={generateDietPlan}
+                      disabled={aiLoading}
+                      title="Regenerate"
+                    >
+                      {aiLoading ? "…" : "↻"}
+                    </button>
+                  </div>
 
-              <div className="iks-diet-section" style={{ marginTop: "1rem" }}>
-                <div className="iks-diet-heading iks-avoid-head">❌ Avoid</div>
-                <ul className="db-diet-list iks-avoid-list">
-                  {diet.avoid.map(item => <li key={item}>{item}</li>)}
-                </ul>
-              </div>
+                  {aiPlan.calorieAdvice && (
+                    <div className="ai-calorie-advice">
+                      💡 {aiPlan.calorieAdvice}
+                    </div>
+                  )}
+
+                  <div className="iks-diet-section">
+                    <div className="iks-diet-heading iks-eat-head">✅ Eat Today</div>
+                    <ul className="db-diet-list">
+                      {aiPlan.eat.map(item => <li key={item}>{item}</li>)}
+                    </ul>
+                  </div>
+
+                  <div className="iks-diet-section" style={{ marginTop: "0.85rem" }}>
+                    <div className="iks-diet-heading iks-avoid-head">❌ Avoid</div>
+                    <ul className="db-diet-list iks-avoid-list">
+                      {aiPlan.avoid.map(item => <li key={item}>{item}</li>)}
+                    </ul>
+                  </div>
+
+                  {aiPlan.lifestyle?.length > 0 && (
+                    <div className="iks-diet-section" style={{ marginTop: "0.85rem" }}>
+                      <div className="iks-diet-heading" style={{ background: "#e8f4ff", color: "#3a7abd" }}>🧘 Lifestyle</div>
+                      <ul className="db-diet-list">
+                        {aiPlan.lifestyle.map(item => <li key={item}>{item}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
           </div>

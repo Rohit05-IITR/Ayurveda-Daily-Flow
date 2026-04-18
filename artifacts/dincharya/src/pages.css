@@ -1013,6 +1013,97 @@
 .iks-avoid-head { background: #fce4ec; color: #c62828; }
 .iks-avoid-list li::before { content: '✕'; color: #e05252; }
 
+/* ── AI DIET PLAN CARD ── */
+.ai-plan-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem 0.5rem;
+}
+.ai-plan-icon { font-size: 2.5rem; margin-bottom: 0.6rem; }
+.ai-plan-hint {
+  font-size: 0.85rem;
+  color: var(--text-mid);
+  line-height: 1.6;
+  margin-bottom: 1.1rem;
+}
+
+.ai-gen-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(135deg, #5a6aff 0%, #8b5cf6 100%);
+  color: white;
+  border: none;
+  border-radius: 999px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 4px 18px rgba(90, 106, 255, 0.35);
+}
+.ai-gen-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); }
+.ai-gen-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.ai-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+.ai-plan-result {}
+.ai-plan-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.ai-plan-theme {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 0.35rem;
+  line-height: 1.4;
+}
+.ai-regen-btn {
+  background: var(--green-50);
+  border: 1.5px solid var(--green-200);
+  border-radius: 999px;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--green-600);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s;
+}
+.ai-regen-btn:hover:not(:disabled) { background: var(--green-100); }
+.ai-regen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.ai-calorie-advice {
+  background: linear-gradient(135deg, #f0f4ff, #f5f0ff);
+  border: 1px solid #d0d8ff;
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.9rem;
+  font-size: 0.82rem;
+  color: #4a5aaa;
+  font-weight: 500;
+  line-height: 1.5;
+  margin-bottom: 0.85rem;
+}
+
 /* responsive */
 @media (max-width: 860px) {
   .db-grid { grid-template-columns: 1fr; }
