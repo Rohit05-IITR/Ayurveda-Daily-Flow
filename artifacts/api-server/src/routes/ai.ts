@@ -63,14 +63,14 @@ Consumed Calories: ${consumedCalories}`;
 
     const apiKey = process.env.GOOGLE_API_KEY || "";
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           system_instruction: { parts: [{ text: systemInstruction }] },
           contents: [{ parts: [{ text: userPrompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 600 },
+          generationConfig: { temperature: 0.7, maxOutputTokens: 2048 },
         }),
       },
     );
@@ -85,10 +85,27 @@ Consumed Calories: ${consumedCalories}`;
       candidates: { content: { parts: { text: string }[] } }[];
     };
 
-    let text = data.candidates[0].content.parts[0].text;
-    text = text.replace(/```json|```/g, "").trim();
+    // gemini-2.5-flash (thinking model) puts actual response in the last non-thought part
+    const parts = data.candidates[0].content.parts as { text?: string; thought?: boolean }[];
+    const responsePart = [...parts].reverse().find(p => !p.thought && p.text);
+    if (!responsePart?.text) {
+      res.status(502).json({ error: "No text found in Gemini response" });
+      return;
+    }
 
-    const plan = JSON.parse(text);
+    let text = responsePart.text;
+
+    // Strip markdown fences and any leading/trailing whitespace
+    text = text.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+
+    // Extract the first JSON object in the response
+    const match = text.match(/\{[\s\S]*\}/);
+    if (!match) {
+      res.status(502).json({ error: "No JSON found in Gemini response", raw: text.slice(0, 300) });
+      return;
+    }
+
+    const plan = JSON.parse(match[0]);
     res.json(plan);
   } catch (err) {
     res.status(500).json({ error: "Failed to generate diet plan", details: String(err) });
