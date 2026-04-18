@@ -112,7 +112,7 @@ export default function Guna() {
                   </div>
                 ))}
               </div>
-              <button className="btn-assess" onClick={() => navigate("/dashboard")}>Go to My Dashboard →</button>
+              <button className="btn-assess" onClick={() => navigate("/health")}>Continue to Health Setup →</button>
             </div>
           </div>
         </main>

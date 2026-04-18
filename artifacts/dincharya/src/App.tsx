@@ -8,6 +8,7 @@ import Signup from "@/pages/Signup";
 import Login from "@/pages/Login";
 import Prakriti from "@/pages/Prakriti";
 import Guna from "@/pages/Guna";
+import Health from "@/pages/Health";
 import Dashboard from "@/pages/Dashboard";
 import "./dincharya.css";
 
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/login"     component={Login}     />
       <Route path="/prakriti"  component={Prakriti}  />
       <Route path="/guna"      component={Guna}      />
+      <Route path="/health"    component={Health}    />
       <Route path="/dashboard" component={Dashboard} />
       <Route component={NotFound} />
     </Switch>

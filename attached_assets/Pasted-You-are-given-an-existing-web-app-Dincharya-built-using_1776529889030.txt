@@ -1,0 +1,198 @@
+You are given an existing web app "Dincharya" built using React with flow:
+signup → prakriti → guna → dashboard
+
+TASK:
+Upgrade the system by:
+1. Adding a new Health Setup page
+2. Enhancing Prakriti logic to dual-dosha
+3. Adding calorie tracking + diet recommendation system
+
+--------------------------------------------------
+
+PART 1: ADD HEALTH SETUP PAGE (Health.jsx)
+
+Update flow:
+signup → prakriti → guna → health → dashboard
+
+Create a new React page: Health.jsx
+
+Inputs:
+- Age
+- Height (cm)
+- Weight (kg)
+- Goal:
+  - Gain Muscle
+  - Lose Weight
+  - Maintain
+- Weekly Goal (0 to 1 kg/week)
+
+Use React state (useState) to manage inputs.
+
+--------------------------------------------------
+
+PART 2: BMI CALCULATION
+
+- Auto calculate:
+  BMI = weight / (height/100)^2
+
+- Display:
+  BMI value + category:
+    <18.5 → Underweight
+    18.5–24.9 → Normal
+    25+ → Overweight
+
+Update dynamically using state.
+
+--------------------------------------------------
+
+PART 3: CALORIE CALCULATION
+
+- maintenance = weight * 30
+- adjustment = weeklyGoal * 7700 / 7
+
+IF:
+- Lose weight → maintenance - adjustment
+- Gain muscle → maintenance + adjustment
+- Maintain → maintenance
+
+- Save result as:
+  dailyCalories
+
+--------------------------------------------------
+
+PART 4: STORE DATA
+
+Store in localStorage:
+- weight
+- height
+- bmi
+- goal
+- weeklyGoal
+- dailyCalories
+
+--------------------------------------------------
+
+PART 5: REDIRECT FLOW
+
+After form submit:
+→ use React Router navigation to "/dashboard"
+
+--------------------------------------------------
+
+PART 6: PRAKRITI LOGIC UPGRADE (DUAL DOSHA)
+
+Update existing Prakriti logic:
+
+- Track scores:
+  Vata, Pitta, Kapha
+
+- Sort scores descending
+
+- Select:
+  primary = highest
+  secondary = second highest
+
+- Combine:
+  prakritiType = "Primary-Secondary"
+
+Example:
+  "Vata-Pitta", "Pitta-Kapha", "Vata-Kapha"
+
+- Store in localStorage:
+  "prakritiType"
+
+--------------------------------------------------
+
+PART 7: DIET RECOMMENDATION SYSTEM
+
+Create a reusable function:
+
+For each prakritiType:
+
+1. Vata-Pitta:
+   - Eat: warm, mildly spiced foods (rice, milk, ghee, fruits)
+   - Avoid: cold, spicy, dry foods
+
+2. Pitta-Kapha:
+   - Eat: cooling, light foods (vegetables, coconut water)
+   - Avoid: oily, spicy, heavy foods
+
+3. Vata-Kapha:
+   - Eat: warm, light foods (soups, lentils, herbal tea)
+   - Avoid: cold, heavy foods
+
+--------------------------------------------------
+
+PART 8: DASHBOARD UPDATE (Dashboard.jsx)
+
+Add 2 new sections:
+
+--------------------------------
+A. CALORIE TRACKER
+
+- Input: food name (useState)
+- Use static food database:
+  rice, egg, paneer, milk
+
+Display:
+- calories
+- protein
+- carbs
+- fats
+
+Track:
+- total consumed calories (useState)
+
+Show:
+"Remaining Calories = dailyCalories - consumed"
+
+--------------------------------
+B. PERSONALIZED IKS DIET PLAN
+
+Display:
+- Prakriti type (from localStorage)
+- Foods to eat
+- Foods to avoid
+
+--------------------------------------------------
+
+PART 9: ROUTING UPDATE
+
+Update React Router:
+
+Add route:
+"/health" → Health.jsx
+
+Update navigation:
+guna → redirect to "/health"
+
+--------------------------------------------------
+
+PART 10: CODE STRUCTURE
+
+- Use functional components
+- Use useState and useEffect
+- Keep logic modular (separate utility functions if needed)
+- Maintain existing UI styling and design system
+
+--------------------------------------------------
+
+STRICT RULES:
+
+- Do NOT remove existing functionality
+- Only extend system
+- Keep logic clean and modular
+- Maintain UI consistency
+
+--------------------------------------------------
+
+OUTPUT:
+
+Provide:
+1. Health.jsx component
+2. Updated Prakriti logic
+3. Diet recommendation function
+4. Updated Dashboard.jsx logic
+5. Updated routing (App.jsx)
+
+No explanation
