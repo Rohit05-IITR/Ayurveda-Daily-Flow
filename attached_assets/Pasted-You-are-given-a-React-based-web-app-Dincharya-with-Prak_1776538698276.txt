@@ -1,0 +1,195 @@
+You are given a React-based web app "Dincharya" with:
+- Prakriti (dual dosha)
+- Goal, BMI, dailyCalories
+- Dashboard with calorie tracker
+
+TASK:
+1. Replace static diet section with Gemini AI recommendations
+2. Integrate CalorieNinjas API (calorie tracking)
+3. Add popup notifications for success/error
+
+--------------------------------------------------
+
+PART 1: ENV SETUP (ONCE)
+
+Frontend (.env):
+
+VITE_GEMINI_API_KEY=AIzaSyBiEp5ONwBXHFAe77X6rkcwQ2HyBG5A10s
+
+Backend (.env):
+
+CALORIE_NINJA_API_KEY=vcLIk4znZA/+/C7BF1u7xA==BurZ6FSBDgnsEgo0
+
+--------------------------------------------------
+
+PART 2: SYSTEM INSTRUCTION (GEMINI)
+
+const systemInstruction = `
+You are a professional Ayurvedic health coach.
+
+Generate a personalized plan based on:
+- Prakriti (dual dosha)
+- Goal
+- BMI
+- Daily calorie target
+- Today's nutrition summary
+
+STRICT JSON ONLY:
+
+{
+  "title": "Short theme",
+  "prakriti": "type",
+  "eat": ["foods"],
+  "avoid": ["foods"],
+  "lifestyle": ["habits"],
+  "calorieAdvice": "short advice"
+}
+`;
+
+--------------------------------------------------
+
+PART 3: USER PROMPT
+
+const userPrompt = `
+Prakriti: ${prakritiType}
+Goal: ${goal}
+BMI: ${bmi}
+Calories Target: ${dailyCalories}
+Consumed Calories: ${consumedCalories}
+`;
+
+--------------------------------------------------
+
+PART 4: GEMINI FUNCTION (WITH POPUP)
+
+async function getDietPlan() {
+  try {
+    const res = await fetch(
+      \`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=\${import.meta.env.VITE_GEMINI_API_KEY}\`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemInstruction }] },
+          contents: [{ parts: [{ text: userPrompt }] }]
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    let text = data.candidates[0].content.parts[0].text;
+    text = text.replace(/```json|```/g, "").trim();
+
+    alert("✅ AI Diet Plan Generated");
+
+    return JSON.parse(text);
+
+  } catch (err) {
+    alert("❌ Failed to generate diet plan");
+    console.error(err);
+  }
+}
+
+--------------------------------------------------
+
+PART 5: BACKEND CALORIE API (CalorieNinjas)
+
+Create Express route:
+
+app.get("/api/nutrition", async (req, res) => {
+  try {
+    const query = req.query.food;
+
+    const response = await fetch(
+      \`https://api.calorieninjas.com/v1/nutrition?query=\${query}\`,
+      {
+        method: "GET",
+        headers: {
+          "X-Api-Key": process.env.CALORIE_NINJA_API_KEY
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    res.json(data);
+
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch nutrition" });
+  }
+});
+
+--------------------------------------------------
+
+PART 6: FRONTEND CALORIE FUNCTION (WITH POPUP)
+
+async function getNutrition(food) {
+  try {
+    const res = await fetch(\`/api/nutrition?food=\${food}\`);
+    const data = await res.json();
+
+    alert("✅ Nutrition data fetched");
+
+    return data;
+
+  } catch (err) {
+    alert("❌ Failed to fetch nutrition");
+    console.error(err);
+  }
+}
+
+--------------------------------------------------
+
+PART 7: DASHBOARD INTEGRATION
+
+- Replace static diet card with AI output
+- Use:
+  plan.title
+  plan.eat
+  plan.avoid
+  plan.lifestyle
+
+- Calorie tracker:
+  - User enters food
+  - Fetch from API
+  - Extract:
+    calories, protein, carbs, fat
+
+- Track total consumed
+
+- Show:
+Remaining Calories = dailyCalories - consumedCalories
+
+--------------------------------------------------
+
+PART 8: UX RULES
+
+- Use alert() popup for:
+  - AI success
+  - AI error
+  - Nutrition success
+  - Nutrition error
+
+- Add loading states
+
+--------------------------------------------------
+
+PART 9: STRICT RULES
+
+- Do NOT expose API keys in frontend
+- Keep UI unchanged
+- Only replace logic
+- Use React hooks
+
+--------------------------------------------------
+
+OUTPUT:
+
+Provide:
+- getDietPlan function
+- backend API route
+- frontend nutrition function
+- dashboard integration
+
+No explanation
