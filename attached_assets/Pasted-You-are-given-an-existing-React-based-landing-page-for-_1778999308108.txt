@@ -1,0 +1,351 @@
+You are given an existing React-based landing page for an AI-powered Ayurvedic wellness platform called "Dincharya".
+
+The current homepage already has:
+- Hero section
+- Feature cards
+- IKS/Ayurveda explanation
+- Process section
+- CTA section
+- Modern green wellness theme
+
+TASK:
+Upgrade the homepage UI/UX to make it feel like a premium modern wellness startup similar to:
+- Apple Health
+- Calm
+- Headspace
+- Levels Health
+
+IMPORTANT:
+- Do NOT redesign from scratch
+- Keep current layout structure
+- Keep existing sections
+- Only enhance visuals, interactions, animations, and storytelling
+- Preserve the green Ayurvedic aesthetic
+
+--------------------------------------------------
+
+PART 1: HERO SECTION TRANSFORMATION
+
+The hero section should become the visual centerpiece.
+
+Current issue:
+- Right side feels empty/static
+- The circles + sun graphic feels too basic
+
+Replace it with:
+- animated wellness visualization
+- glowing central orb/sun
+- rotating energy rings
+- subtle floating particles/leaves
+- breathing animation effect
+- soft radial gradients
+
+Make it feel:
+- calming
+- futuristic
+- AI-powered
+- wellness-focused
+
+Add:
+- subtle motion animations
+- smooth glow effects
+- ambient floating elements
+
+Use Framer Motion for animations.
+
+--------------------------------------------------
+
+PART 2: PREMIUM NAVBAR
+
+Upgrade navbar styling:
+
+- Add glassmorphism effect
+- Add blur background
+- Sticky navbar on scroll
+- Smooth transition on scroll
+- Active section highlight
+- Better hover effects
+
+Navbar should feel modern and premium.
+
+Example:
+- soft transparency
+- subtle shadow
+- smooth hover underline
+
+--------------------------------------------------
+
+PART 3: HERO TYPOGRAPHY & CTA
+
+Improve hero text hierarchy.
+
+Enhance:
+- headline size
+- spacing
+- contrast
+- readability
+
+Add:
+- animated gradient highlight on keywords
+- smooth fade-in stagger animation
+
+CTA buttons:
+Primary button:
+- stronger gradient
+- soft glow shadow
+- hover scale animation
+- animated arrow movement
+
+Secondary button:
+- outlined glass style
+- smooth hover fill animation
+
+--------------------------------------------------
+
+PART 4: ADD DASHBOARD PREVIEW SECTION
+
+Create a new premium section:
+"See Your Personalized Wellness Dashboard"
+
+This is VERY IMPORTANT.
+
+Add:
+- floating dashboard mockup
+- AI diet recommendation preview
+- calorie tracker preview
+- charts preview
+- streak tracker preview
+
+Use:
+- layered cards
+- depth effects
+- shadows
+- floating animations
+
+Make this section a major visual attraction.
+
+--------------------------------------------------
+
+PART 5: FEATURE CARDS UPGRADE
+
+Current feature cards feel too flat.
+
+Enhance ALL feature cards:
+
+- Add hover lift effect
+- Add subtle gradients
+- Add mini illustrations/icons
+- Add layered shadows
+- Add animated hover glow
+- Add smooth transitions
+
+Improve card hierarchy:
+- bigger icons
+- cleaner spacing
+- stronger titles
+
+Optional:
+- animated background patterns
+- floating accent shapes
+
+--------------------------------------------------
+
+PART 6: SECTION TRANSITIONS
+
+Current sections feel disconnected.
+
+Add:
+- smooth section separators
+- curved transitions
+- soft gradient fades
+- organic flowing shapes
+- subtle background textures
+
+Make scrolling feel fluid and continuous.
+
+--------------------------------------------------
+
+PART 7: HOW IT WORKS SECTION
+
+Upgrade process cards:
+
+- Add animated connector line
+- Add progress arrows
+- Add hover animations
+- Add visual timeline effect
+- Improve spacing
+
+Cards should feel interactive.
+
+--------------------------------------------------
+
+PART 8: ADD AI SECTION (VERY IMPORTANT)
+
+Create a dedicated section:
+"✨ AI-Powered Ayurvedic Intelligence"
+
+Showcase:
+- personalized AI recommendations
+- prakriti analysis
+- calorie optimization
+- Gemini AI integration
+- adaptive wellness guidance
+
+Add:
+- animated AI visual
+- floating recommendation cards
+- dynamic text transitions
+
+This should become the app’s USP section.
+
+--------------------------------------------------
+
+PART 9: MICROINTERACTIONS
+
+Add premium microinteractions everywhere:
+
+- hover scaling
+- button ripple effect
+- card glow
+- icon animations
+- smooth easing
+- fade transitions
+
+Animations should feel:
+- subtle
+- premium
+- smooth
+- not excessive
+
+--------------------------------------------------
+
+PART 10: ANIMATIONS
+
+Use Framer Motion.
+
+Add:
+- fade-up animations
+- stagger animations
+- scroll reveal
+- floating animations
+- parallax movement
+- smooth page transitions
+
+Animate:
+- cards
+- stats
+- headings
+- illustrations
+- buttons
+
+--------------------------------------------------
+
+PART 11: PREMIUM BACKGROUNDS
+
+Current backgrounds feel too plain.
+
+Enhance using:
+- radial gradients
+- soft noise texture
+- Ayurvedic-inspired patterns
+- glowing blobs
+- subtle depth effects
+
+Avoid:
+- dark themes
+- clutter
+- overdesigned visuals
+
+Maintain:
+- calm
+- airy
+- breathable UI
+
+--------------------------------------------------
+
+PART 12: STATS SECTION IMPROVEMENT
+
+Upgrade:
+5000+
+3
+∞
+
+Make them:
+- animated counters
+- glowing
+- interactive
+- visually stronger
+
+Add:
+- hover effects
+- smooth number count animation
+
+--------------------------------------------------
+
+PART 13: SOCIAL PROOF SECTION
+
+Add a new section:
+
+Examples:
+- testimonials
+- user avatars
+- wellness transformation stats
+- IIT Roorkee project credibility
+- user success metrics
+
+Keep it clean and minimal.
+
+--------------------------------------------------
+
+PART 14: RESPONSIVENESS
+
+Ensure premium responsiveness:
+- mobile-first improvements
+- better stacking
+- reduced whitespace issues
+- improved tablet layouts
+- smooth scaling animations
+
+--------------------------------------------------
+
+PART 15: DESIGN SYSTEM
+
+Maintain:
+- green wellness aesthetic
+- minimal luxury style
+- soft shadows
+- rounded corners
+- clean typography
+- airy spacing
+
+Design should feel:
+- modern startup
+- premium wellness
+- AI-enhanced
+- calming
+
+--------------------------------------------------
+
+STRICT RULES:
+
+- Use React
+- Use Framer Motion
+- Use modern CSS/Tailwind
+- Keep existing functionality intact
+- Do NOT remove sections
+- Only enhance UI/UX
+- Keep code modular and clean
+
+--------------------------------------------------
+
+OUTPUT:
+
+Provide:
+1. Updated homepage component structure
+2. Animation integration
+3. New sections
+4. Improved styling
+5. Responsive enhancements
+6. Premium interaction improvements
+
+No explanation
