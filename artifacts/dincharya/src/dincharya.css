@@ -55,9 +55,9 @@
 }
 
 .nav-container {
-  max-width: 1160px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 clamp(1.5rem, 4%, 3rem);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -189,10 +189,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7rem 2rem 4rem;
-  max-width: 1160px;
+  padding: 7rem clamp(1.5rem, 4%, 3rem) 4rem;
+  max-width: 1400px;
   margin: 0 auto;
-  gap: 3rem;
+  gap: 2rem;
   position: relative;
 }
 
@@ -221,7 +221,7 @@
 
 .hero-content {
   flex: 1;
-  max-width: 580px;
+  max-width: 620px;
 }
 
 .hero-badge {
@@ -367,9 +367,9 @@
 
 /* ===== SECTION SHARED ===== */
 .section-container {
-  max-width: 1160px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 5rem 2rem;
+  padding: 5rem clamp(1.5rem, 4%, 3rem);
 }
 
 .section-label {

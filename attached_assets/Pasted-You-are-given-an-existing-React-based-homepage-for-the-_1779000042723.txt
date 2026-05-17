@@ -1,0 +1,257 @@
+You are given an existing React-based homepage for the wellness platform "Dincharya".
+
+The homepage UI is already modern and animated, but there are important layout and composition problems that must now be fixed.
+
+IMPORTANT:
+Do NOT redesign the homepage.
+Only refine and optimize the existing layout, spacing, proportions, and visual composition.
+
+--------------------------------------------------
+
+CURRENT ISSUES TO FIX
+
+1. Too much left and right margin
+- The content container is too narrow
+- Large unused whitespace exists on ultra-wide screens
+- Hero section feels compressed
+
+2. Hero visualization feels distorted
+- The sun/orb graphic proportions look stretched
+- Rings are not perfectly circular
+- Glow is too diffused
+- Floating elements feel randomly placed
+
+3. Hero composition imbalance
+- Text and visual feel disconnected
+- Horizontal spacing is too large
+- CTA buttons are too wide
+
+--------------------------------------------------
+
+PART 1: FIX GLOBAL CONTAINER WIDTH
+
+Increase homepage layout width significantly.
+
+Current layout feels constrained.
+
+Update all major sections:
+- Hero
+- Features
+- Process
+- Dashboard preview
+- CTA sections
+
+Use:
+- wider max-width
+- improved responsive spacing
+- better horizontal balance
+
+Preferred layout:
+- width: min(92%, 1600px)
+- larger desktop utilization
+- reduced empty whitespace
+
+Do NOT make the UI edge-to-edge.
+Maintain premium breathing space.
+
+--------------------------------------------------
+
+PART 2: FIX HERO SECTION PROPORTIONS
+
+Improve hero layout proportions.
+
+Current issue:
+- Left text block too compressed
+- Right visualization oversized and detached
+
+Update layout ratio:
+- Left side: 50%
+- Right side: 50%
+
+Reduce excessive horizontal gap between both sides.
+
+Align visual composition more closely with text.
+
+--------------------------------------------------
+
+PART 3: FIX DISTORTED SUN / ORB VISUAL
+
+The current animated orb visualization looks stretched.
+
+Fix ALL rings and orb layers:
+
+- Maintain perfect circles
+- Prevent stretching
+- Use equal width and height
+- Preserve aspect ratio
+
+Requirements:
+- Use aspect-ratio: 1/1
+- All orbit rings must remain circular
+- Center orb should feel balanced and sharp
+
+Improve:
+- ring thickness
+- glow sharpness
+- spacing between orbit layers
+
+--------------------------------------------------
+
+PART 4: IMPROVE GLOW EFFECTS
+
+Current glow is too washed out and diffused.
+
+Replace with:
+- concentrated radial glow
+- layered blur
+- softer opacity
+- more focused center lighting
+
+The glow should:
+- feel premium
+- subtle
+- calming
+- not overpowering
+
+Avoid excessive blur spread.
+
+--------------------------------------------------
+
+PART 5: FIX FLOATING ELEMENT COMPOSITION
+
+Current floating cards/icons feel randomly positioned.
+
+Reposition elements intentionally around the orb:
+
+Examples:
+- streak card → lower right
+- score card → center left
+- prakriti badge → upper right
+
+All floating elements should:
+- orbit naturally
+- maintain visual balance
+- feel part of one system
+
+Improve spacing consistency.
+
+--------------------------------------------------
+
+PART 6: CTA BUTTON IMPROVEMENTS
+
+Current buttons are too wide horizontally.
+
+Fix:
+- reduce width
+- use fit-content sizing
+- improve padding balance
+
+Primary button:
+- stronger gradient
+- better shadow
+- hover glow
+- animated arrow
+
+Secondary button:
+- refined outline style
+- premium hover transition
+
+Buttons should feel:
+- compact
+- premium
+- intentional
+
+--------------------------------------------------
+
+PART 7: HERO BACKGROUND IMPROVEMENTS
+
+Current background feels too flat.
+
+Add:
+- subtle radial gradients
+- soft ambient lighting
+- Ayurvedic-inspired glow
+- light layered depth
+
+Keep:
+- minimal aesthetic
+- clean appearance
+- calm atmosphere
+
+Avoid:
+- dark gradients
+- heavy textures
+
+--------------------------------------------------
+
+PART 8: IMPROVE TYPOGRAPHY SPACING
+
+Typography is strong already, but improve:
+
+- paragraph width
+- line-height
+- spacing below heading
+- readability balance
+
+Prevent text from stretching too wide.
+
+Maintain:
+- bold premium headline
+- modern wellness aesthetic
+
+--------------------------------------------------
+
+PART 9: DEPTH & LAYERING
+
+Add better visual depth to hero section.
+
+Create:
+- foreground particles
+- midground orbit rings
+- background gradients
+
+Use z-index layering properly.
+
+The hero should feel immersive and dimensional.
+
+--------------------------------------------------
+
+PART 10: RESPONSIVENESS
+
+Ensure fixes work properly on:
+- large desktop screens
+- laptops
+- tablets
+- mobile
+
+Maintain:
+- balanced spacing
+- correct orb proportions
+- readable typography
+- responsive floating elements
+
+--------------------------------------------------
+
+STRICT RULES
+
+- Use React
+- Use Framer Motion
+- Keep existing animations
+- Do NOT redesign sections
+- Only refine layout and composition
+- Keep premium green wellness aesthetic
+- Keep code modular and clean
+
+--------------------------------------------------
+
+OUTPUT
+
+Provide:
+1. Updated layout structure
+2. Improved hero composition
+3. Corrected orb/ring styling
+4. Better spacing system
+5. Improved button styling
+6. Responsive refinements
+
+No explanation
