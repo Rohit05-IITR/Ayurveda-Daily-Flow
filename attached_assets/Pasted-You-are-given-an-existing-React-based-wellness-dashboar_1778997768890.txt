@@ -1,0 +1,258 @@
+You are given an existing React-based wellness dashboard app called "Dincharya".
+
+The current dashboard UI is functional and responsive with:
+- Dinacharya Score
+- Calorie Tracker
+- AI Diet Plan
+- Daily Log
+- Reminder Cards
+- IKS Profile
+
+TASK:
+Upgrade the entire dashboard UI to look like a premium modern wellness application similar to:
+- Apple Health
+- Headspace
+- Calm
+- MyFitnessPal
+
+IMPORTANT:
+- Do NOT redesign from scratch
+- Preserve the current structure and green wellness theme
+- Only enhance the existing UI and UX
+
+--------------------------------------------------
+
+PART 1: HEADER / HERO SECTION
+
+Upgrade the top hero section:
+
+- Add smooth green gradient background
+- Add subtle radial glow / abstract shape in background
+- Improve typography hierarchy
+- Add dynamic greeting:
+  - Good Morning ☀️
+  - Good Afternoon 🌤️
+  - Good Evening 🌙
+
+Keep:
+- logo
+- user greeting
+- date
+
+Add:
+- smooth fade-in animation on load
+
+--------------------------------------------------
+
+PART 2: VISUAL HIERARCHY
+
+Make these cards visually dominant:
+1. Dinacharya Score
+2. AI Diet Plan
+3. Calorie Tracker
+
+Increase:
+- heading size
+- padding
+- spacing
+- contrast
+- card prominence
+
+Reduce visual flatness.
+
+--------------------------------------------------
+
+PART 3: CARD ENHANCEMENTS
+
+For ALL cards:
+
+- Add softer shadows
+- Add glassmorphism-inspired subtle background
+- Add hover lift animation:
+  transform: translateY(-4px)
+
+- Add smooth transitions:
+  transition: all 0.3s ease
+
+- Add better border radius
+- Improve spacing consistency
+
+--------------------------------------------------
+
+PART 4: AI DIET PLAN CARD (MOST IMPORTANT)
+
+Completely enhance the AI plan card.
+
+Requirements:
+- Make it look premium and dynamic
+- Add colored prakriti badge
+- Add section dividers
+- Add icons for:
+  - Eat
+  - Avoid
+  - Lifestyle
+- Improve typography and spacing
+- Add gradient button for:
+  "✨ Generate AI Plan"
+
+After AI response:
+Display:
+- Title
+- Prakriti type
+- Foods to eat
+- Foods to avoid
+- Lifestyle tips
+- Calorie advice
+
+Add:
+- loading skeleton while AI generates
+- regenerate button
+
+--------------------------------------------------
+
+PART 5: CALORIE TRACKER UI
+
+Upgrade calorie tracker section:
+
+- Improve meal input styling
+- Add floating focus effects
+- Add animated Add button
+- Add logged meals list UI
+
+Meal cards should show:
+- Food icon
+- Calories
+- Protein
+- Carbs
+- Fat
+
+Add:
+- Daily calorie progress bar
+- Remaining calories indicator
+- Smooth animated counters
+
+--------------------------------------------------
+
+PART 6: DAILY LOG UI
+
+Enhance:
+- wake-up time
+- sleep time
+- meal timing
+- screen time
+
+Use:
+- modern input styling
+- icons inside inputs
+- soft focus glow
+- improved spacing
+
+Improve Save button:
+- hover animation
+- active press animation
+- soft glow shadow
+
+--------------------------------------------------
+
+PART 7: REMINDER SECTION
+
+Improve reminder cards:
+
+- Add colored left border
+- Add icons
+- Add subtle hover interaction
+- Better spacing
+- Softer background colors
+
+--------------------------------------------------
+
+PART 8: TYPOGRAPHY
+
+Improve typography globally:
+
+- stronger heading hierarchy
+- cleaner font spacing
+- slightly darker body text
+- improved line-height
+
+Use:
+- modern wellness app typography style
+
+--------------------------------------------------
+
+PART 9: ANIMATIONS
+
+Add smooth modern animations:
+
+- fade-in on load
+- hover animations
+- progress bar animation
+- button scaling
+- smooth card transitions
+
+Keep animations subtle and premium.
+
+--------------------------------------------------
+
+PART 10: CHARTS & VISUALS
+
+Add modern charts using Recharts:
+
+1. Weekly Dinacharya Score
+2. Calorie Intake Progress
+3. Habit Consistency
+
+Charts should:
+- match green theme
+- use rounded corners
+- have clean tooltips
+- look minimal and premium
+
+--------------------------------------------------
+
+PART 11: RESPONSIVENESS
+
+Improve mobile responsiveness:
+
+- Stack cards properly
+- Reduce empty whitespace
+- Improve sidebar layout
+- Maintain premium appearance on smaller screens
+
+--------------------------------------------------
+
+PART 12: DESIGN SYSTEM
+
+Maintain:
+- current green wellness aesthetic
+- clean card-based layout
+- minimalist UI style
+
+Avoid:
+- clutter
+- overly dark colors
+- excessive animations
+
+--------------------------------------------------
+
+STRICT RULES:
+
+- Use React
+- Use functional components
+- Use modern CSS
+- Keep existing functionality intact
+- Do NOT remove current logic
+- Only enhance UI/UX
+
+--------------------------------------------------
+
+OUTPUT:
+
+Provide:
+1. Updated dashboard component structure
+2. Improved CSS/Tailwind styles
+3. Animation additions
+4. Chart integration
+5. Responsive layout improvements
+
+No explanation
