@@ -1,0 +1,285 @@
+You are given an existing React-based wellness dashboard for "Dincharya".
+
+The dashboard is already functional with:
+- AI-generated Ayurvedic plans
+- Calorie tracking
+- Nutrition analysis
+- Prakriti insights
+- Charts and reminders
+
+Now optimize the dashboard UX/UI and improve functionality.
+
+IMPORTANT:
+Do NOT redesign the dashboard.
+Only improve layout structure, responsiveness, usability, and data organization.
+
+--------------------------------------------------
+
+PART 1: FIX EXCESSIVE LEFT/RIGHT MARGINS
+
+Current issue:
+- Too much empty space on both sides
+- Content feels compressed
+- Dashboard not utilizing screen width properly
+
+Fix:
+- Increase overall container width
+- Use:
+  width: min(96%, 1700px)
+
+- Reduce unnecessary side padding
+- Improve desktop responsiveness
+
+Goal:
+- More immersive dashboard
+- Better use of widescreen layouts
+- Cleaner grid alignment
+
+--------------------------------------------------
+
+PART 2: FIX AI PLAN CARD HEIGHT
+
+Current issue:
+- AI-generated personalized plan card becomes extremely long
+- Creates imbalance in dashboard layout
+- Pushes entire page vertically
+
+Fix:
+- Convert AI plan card into scrollable card
+- Add:
+  max-height
+  overflow-y: auto
+
+- Keep card visually premium
+- Preserve sections:
+  - Eat Today
+  - Avoid
+  - Lifestyle
+  - Daily Guidance
+
+Add:
+- smooth scrollbar styling
+- sticky card header
+- better spacing between sections
+
+Goal:
+- Compact layout
+- Cleaner dashboard proportions
+- Better reading experience
+
+--------------------------------------------------
+
+PART 3: REMOVE API ALERT POPUPS
+
+Current issue:
+- Alert popups appear when APIs succeed/fail
+- Feels unprofessional
+
+Remove ALL:
+- alert()
+- browser popup notifications
+
+Replace with:
+- silent background API handling
+
+Optional:
+- subtle toast notifications only if necessary
+
+Goal:
+- Smooth premium UX
+
+--------------------------------------------------
+
+PART 4: IMPROVE FOOD SEARCH EXPERIENCE
+
+Current issue:
+- Food search does not suggest matching foods
+- User must type exact names
+
+Implement:
+REAL-TIME AUTOCOMPLETE SEARCH
+
+Features:
+- As user types:
+  show dropdown suggestions
+
+Examples:
+typing:
+- "mil" → milk
+- "ric" → rice
+- "pan" → paneer
+
+Requirements:
+- Debounced search
+- Smooth dropdown animation
+- Keyboard navigation support
+- Click to select suggestion
+
+Use existing calorie API integration.
+
+--------------------------------------------------
+
+PART 5: SPLIT MEALS INTO 4 SECTIONS
+
+Current issue:
+- Meal log keeps increasing vertically forever
+- All foods are grouped together
+
+Create 4 meal categories:
+1. Breakfast
+2. Lunch
+3. Snacks
+4. Dinner
+
+Each section should:
+- Have separate add-food input
+- Independent meal list
+- Individual calories subtotal
+
+Display:
+- calories
+- protein
+- carbs
+- fats
+
+Keep:
+- overall daily totals below all sections
+
+Goal:
+- Cleaner organization
+- Better meal tracking
+- Controlled card height
+
+--------------------------------------------------
+
+PART 6: COLLAPSIBLE MEAL SECTIONS
+
+Enhance meal UX further.
+
+Each meal section should:
+- Expand/collapse
+- Show:
+  total calories for that section
+
+Default:
+- Breakfast expanded
+- Others collapsed on mobile
+
+Add:
+- smooth Framer Motion transitions
+
+--------------------------------------------------
+
+PART 7: ADD CUSTOM REMINDERS SECTION
+
+Create a new dashboard card:
+"Custom Habit Reminders"
+
+User can:
+- Add reminder title
+- Select time
+- Select category:
+  - Meditation
+  - Workout
+  - Water
+  - Sleep
+  - Journaling
+  - Custom
+
+Features:
+- Add reminder
+- Delete reminder
+- Mark complete
+- Save in localStorage
+
+UI:
+- Beautiful wellness-themed cards
+- Soft colors
+- Tiny icons
+- Animated check state
+
+Example reminders:
+- Meditate at 6 AM
+- Drink warm water
+- Evening walk
+- Sleep before 10 PM
+
+--------------------------------------------------
+
+PART 8: RESPONSIVE GRID IMPROVEMENTS
+
+Current dashboard stacking feels unbalanced.
+
+Fix layout:
+Desktop:
+- Left side:
+  score + meals + charts
+- Right side:
+  profile + AI plan + reminders
+
+Tablet:
+- 2-column responsive grid
+
+Mobile:
+- stacked clean layout
+
+--------------------------------------------------
+
+PART 9: IMPROVE VISUAL HIERARCHY
+
+Improve:
+- card spacing
+- typography
+- shadows
+- padding
+- section separation
+
+Reduce visual clutter.
+
+Keep:
+- soft green Ayurvedic palette
+- premium clean aesthetic
+- rounded modern cards
+
+--------------------------------------------------
+
+PART 10: PERFORMANCE OPTIMIZATION
+
+Optimize:
+- API calls
+- re-renders
+- large meal logs
+
+Use:
+- memoization where needed
+- reusable components
+- modular React structure
+
+--------------------------------------------------
+
+STRICT RULES
+
+- Use React
+- Use Framer Motion
+- Keep existing functionality
+- Keep existing APIs
+- Do NOT redesign dashboard
+- Only improve UX/UI and structure
+- Maintain premium wellness aesthetic
+- Keep code modular and scalable
+
+--------------------------------------------------
+
+OUTPUT
+
+Provide:
+1. Updated dashboard layout
+2. Scrollable AI plan card
+3. Meal-category system
+4. Food autocomplete search
+5. Reminder management system
+6. Responsive grid improvements
+7. Silent API handling
+8. Improved spacing and sizing
+
+No explanation

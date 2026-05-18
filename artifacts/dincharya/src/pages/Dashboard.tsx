@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis,
   Tooltip, ResponsiveContainer, CartesianGrid, Cell,
@@ -6,11 +7,60 @@ import {
 import "../pages.css";
 import "./dashboard.css";
 
-/* ── Types ── */
+/* ════════════════════════════════════
+   TYPES
+   ════════════════════════════════════ */
 interface FoodEntry { name: string; qty: number; cal: number; protein: number; carbs: number; fats: number; }
 interface AiPlan   { title: string; prakriti: string; eat: string[]; avoid: string[]; lifestyle: string[]; calorieAdvice: string; }
 interface DailyData { wakeTime: string; sleepTime: string; mealTime: string; screenTime: string; }
+type MealCat = "breakfast" | "lunch" | "snacks" | "dinner";
+interface MealState { log: FoodEntry[]; query: string; qty: number; loading: boolean; error: string; open: boolean; showSug: boolean; }
+interface CustomReminder { id: string; title: string; time: string; category: string; done: boolean; }
 
+/* ════════════════════════════════════
+   CONSTANTS
+   ════════════════════════════════════ */
+const MEAL_CONFIG: Record<MealCat, { label: string; icon: string; color: string }> = {
+  breakfast: { label: "Breakfast", icon: "🌅", color: "#f97316" },
+  lunch:     { label: "Lunch",     icon: "☀️",  color: "#10b981" },
+  snacks:    { label: "Snacks",    icon: "🍎",  color: "#8b5cf6" },
+  dinner:    { label: "Dinner",    icon: "🌙",  color: "#3b82f6" },
+};
+
+const REMINDER_CATS = [
+  { value: "meditation", label: "Meditation", icon: "🧘" },
+  { value: "workout",    label: "Workout",    icon: "💪" },
+  { value: "water",      label: "Water",      icon: "💧" },
+  { value: "sleep",      label: "Sleep",      icon: "😴" },
+  { value: "journaling", label: "Journaling", icon: "📝" },
+  { value: "custom",     label: "Custom",     icon: "✨" },
+];
+
+const REM_COLORS: Record<string, string> = {
+  meditation: "#8b5cf6", workout: "#ef4444", water: "#3b82f6",
+  sleep: "#6366f1", journaling: "#f59e0b", custom: "#10b981",
+};
+
+const FOOD_LIST = [
+  "rice", "dal", "roti", "chapati", "paneer", "milk", "yogurt", "eggs",
+  "chicken breast", "fish curry", "banana", "apple", "orange", "mango",
+  "oats", "bread", "butter", "ghee", "almonds", "walnuts", "cashews",
+  "spinach", "broccoli", "carrot", "tomato", "potato", "sweet potato",
+  "lentils", "chickpeas", "rajma", "moong dal", "idli", "dosa",
+  "poha", "upma", "sambar", "biryani", "paratha", "curd", "lassi",
+  "100g rice", "2 eggs", "1 cup milk", "1 banana", "100g chicken breast",
+  "1 roti", "1 cup dal", "100g paneer", "1 cup oats", "1 apple",
+];
+
+const WEEKLY_SCORE = [
+  { day: "Mon", score: 62 }, { day: "Tue", score: 68 }, { day: "Wed", score: 71 },
+  { day: "Thu", score: 65 }, { day: "Fri", score: 77 }, { day: "Sat", score: 74 },
+  { day: "Sun", score: 78 },
+];
+
+/* ════════════════════════════════════
+   HELPERS
+   ════════════════════════════════════ */
 function streakBadge(n: number) {
   if (n >= 30) return "MASTER";
   if (n >= 14) return "ADVANCED";
@@ -18,32 +68,303 @@ function streakBadge(n: number) {
   if (n >= 3)  return "BUILDING";
   return "BEGINNER";
 }
-
 function getGreeting() {
   const h = new Date().getHours();
-  if (h >= 5 && h < 12) return { text: "Good Morning",   emoji: "☀️" };
+  if (h >= 5  && h < 12) return { text: "Good Morning",   emoji: "☀️" };
   if (h >= 12 && h < 17) return { text: "Good Afternoon", emoji: "🌤️" };
   return { text: "Good Evening", emoji: "🌙" };
 }
+function blankMeal(open = false): MealState {
+  return { log: [], query: "", qty: 1, loading: false, error: "", open, showSug: false };
+}
 
-const WEEKLY_SCORE = [
-  { day: "Mon", score: 62 },
-  { day: "Tue", score: 68 },
-  { day: "Wed", score: 71 },
-  { day: "Thu", score: 65 },
-  { day: "Fri", score: 77 },
-  { day: "Sat", score: 74 },
-  { day: "Sun", score: 78 },
-];
+/* ════════════════════════════════════
+   MEAL SECTION COMPONENT
+   ════════════════════════════════════ */
+interface MealSectionProps {
+  cat: MealCat;
+  state: MealState;
+  onChange: (patch: Partial<MealState>) => void;
+  onAdd:    (cat: MealCat) => void;
+  onRemove: (cat: MealCat, idx: number) => void;
+}
 
-const REMINDERS = [
-  { icon: "🌙", text: "Sleep before 10 PM for optimal Vata balance",              color: "#6366f1" },
-  { icon: "📵", text: "Avoid late-night screen exposure after 9 PM",               color: "#f59e0b" },
-  { icon: "🍽️", text: "Maintain regular meal timing — eat at the same time daily", color: "#10b981" },
-  { icon: "🌅", text: "Wake up during Brahma Muhurta (5–6 AM) for clarity",        color: "#f97316" },
-  { icon: "💧", text: "Drink warm water first thing every morning",                 color: "#3b82f6" },
-];
+function MealSection({ cat, state, onChange, onAdd, onRemove }: MealSectionProps) {
+  const cfg    = MEAL_CONFIG[cat];
+  const inpRef = useRef<HTMLInputElement>(null);
+  const sugRef = useRef<HTMLDivElement>(null);
 
+  const total = useMemo(() => state.log.reduce(
+    (s, f) => ({ cal: s.cal + f.cal, p: s.p + f.protein, c: s.c + f.carbs, f: s.f + f.fats }),
+    { cal: 0, p: 0, c: 0, f: 0 }
+  ), [state.log]);
+
+  const filtered = useMemo(() => {
+    if (state.query.length < 2) return [];
+    const q = state.query.toLowerCase();
+    return FOOD_LIST.filter(f => f.includes(q)).slice(0, 6);
+  }, [state.query]);
+
+  useEffect(() => {
+    function close(e: MouseEvent) {
+      if (sugRef.current?.contains(e.target as Node)) return;
+      if (inpRef.current?.contains(e.target as Node)) return;
+      onChange({ showSug: false });
+    }
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [onChange]);
+
+  return (
+    <div className="meal-section">
+      <button
+        className="meal-header"
+        onClick={() => onChange({ open: !state.open })}
+        style={{ borderLeftColor: cfg.color }}
+      >
+        <div className="meal-header-left">
+          <span className="meal-icon">{cfg.icon}</span>
+          <span className="meal-label">{cfg.label}</span>
+          {state.log.length > 0 && (
+            <span className="meal-count">{state.log.length} item{state.log.length !== 1 ? "s" : ""}</span>
+          )}
+        </div>
+        <div className="meal-header-right">
+          {total.cal > 0 && (
+            <span className="meal-cal-badge" style={{ color: cfg.color }}>{total.cal} kcal</span>
+          )}
+          <motion.span
+            className="meal-chevron"
+            animate={{ rotate: state.open ? 180 : 0 }}
+            transition={{ duration: 0.22 }}
+          >▾</motion.span>
+        </div>
+      </button>
+
+      <AnimatePresence initial={false}>
+        {state.open && (
+          <motion.div
+            key="body"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+            style={{ overflow: "hidden" }}
+          >
+            <div className="meal-body">
+              <div className="cal-add-row" style={{ position: "relative" }}>
+                <div className="cal-input-wrap">
+                  <span className="cal-input-icon">🍽️</span>
+                  <input
+                    ref={inpRef}
+                    type="text"
+                    placeholder="e.g. 100g rice, 2 eggs, 1 cup dal"
+                    value={state.query}
+                    onChange={e => onChange({ query: e.target.value, error: "", showSug: true })}
+                    onFocus={() => onChange({ showSug: true })}
+                    onKeyDown={e => {
+                      if (e.key === "Enter" && !state.loading) onAdd(cat);
+                      if (e.key === "Escape") onChange({ showSug: false });
+                    }}
+                    className="cal-food-input"
+                    disabled={state.loading}
+                  />
+                  <AnimatePresence>
+                    {state.showSug && filtered.length > 0 && (
+                      <motion.div
+                        ref={sugRef}
+                        className="ac-dropdown"
+                        initial={{ opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.15 }}
+                      >
+                        {filtered.map(s => (
+                          <button
+                            key={s}
+                            className="ac-item"
+                            onMouseDown={e => {
+                              e.preventDefault();
+                              onChange({ query: s, showSug: false });
+                              setTimeout(() => inpRef.current?.focus(), 0);
+                            }}
+                          >
+                            <span className="ac-icon">🔍</span>
+                            {s}
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+                <input
+                  type="number" min={0.5} step={0.5} value={state.qty}
+                  onChange={e => onChange({ qty: Number(e.target.value) })}
+                  className="cal-qty-input" title="Serving multiplier" disabled={state.loading}
+                />
+                <button
+                  className="cal-add-btn"
+                  onClick={() => onAdd(cat)}
+                  disabled={state.loading || !state.query.trim()}
+                >
+                  {state.loading ? <span className="cal-btn-spin" /> : <><span>+</span> Add</>}
+                </button>
+              </div>
+
+              {state.error && <p className="cal-error">{state.error}</p>}
+
+              {state.log.length > 0 ? (
+                <>
+                  <div className="cal-log">
+                    <AnimatePresence>
+                      {state.log.map((entry, i) => (
+                        <motion.div
+                          key={`${entry.name}-${i}`}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="cal-log-row"
+                        >
+                          <span className="cal-log-food-icon">🥗</span>
+                          <div className="cal-log-info">
+                            <span className="cal-food-name">
+                              {entry.name} <span className="cal-qty">×{entry.qty}</span>
+                            </span>
+                            <div className="cal-macros">
+                              <span className="macro macro-cal">{entry.cal} kcal</span>
+                              <span className="macro macro-p">P {entry.protein}g</span>
+                              <span className="macro macro-c">C {entry.carbs}g</span>
+                              <span className="macro macro-f">F {entry.fats}g</span>
+                            </div>
+                          </div>
+                          <button className="cal-remove" onClick={() => onRemove(cat, i)}>✕</button>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                  <div className="meal-subtotal">
+                    <span className="meal-sub-lbl">Meal Total</span>
+                    <div className="meal-sub-macros">
+                      <span style={{ color: "#10b981", fontWeight: 700 }}>{total.cal} kcal</span>
+                      <span style={{ color: "#3b82f6" }}>P {total.p.toFixed(1)}g</span>
+                      <span style={{ color: "#f59e0b" }}>C {total.c.toFixed(1)}g</span>
+                      <span style={{ color: "#ef4444" }}>F {total.f.toFixed(1)}g</span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="meal-empty">No items logged for this meal</div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════
+   CUSTOM REMINDERS COMPONENT
+   ════════════════════════════════════ */
+function CustomReminders() {
+  const [reminders, setReminders] = useState<CustomReminder[]>(() =>
+    JSON.parse(localStorage.getItem("customReminders") || "[]")
+  );
+  const [title,    setTitle]    = useState("");
+  const [time,     setTime]     = useState("");
+  const [category, setCategory] = useState("meditation");
+
+  function persist(list: CustomReminder[]) {
+    setReminders(list);
+    localStorage.setItem("customReminders", JSON.stringify(list));
+  }
+  function add() {
+    if (!title.trim()) return;
+    persist([...reminders, { id: `${Date.now()}`, title: title.trim(), time, category, done: false }]);
+    setTitle(""); setTime("");
+  }
+  function toggle(id: string) { persist(reminders.map(r => r.id === id ? { ...r, done: !r.done } : r)); }
+  function remove(id: string) { persist(reminders.filter(r => r.id !== id)); }
+
+  const catInfo = (v: string) => REMINDER_CATS.find(c => c.value === v) ?? REMINDER_CATS[REMINDER_CATS.length - 1];
+
+  return (
+    <>
+      <div className="db-card-label">Custom Habit Reminders</div>
+      <div className="db-section-title" style={{ marginBottom: "1rem" }}>Daily Wellness Habits</div>
+
+      <div className="rem-add-form">
+        <input
+          className="rem-input"
+          type="text"
+          placeholder="e.g. Morning meditation, Evening walk…"
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && add()}
+          maxLength={60}
+        />
+        <div className="rem-add-row">
+          <input className="rem-time-input" type="time" value={time} onChange={e => setTime(e.target.value)} />
+          <select className="rem-select" value={category} onChange={e => setCategory(e.target.value)}>
+            {REMINDER_CATS.map(c => (
+              <option key={c.value} value={c.value}>{c.icon} {c.label}</option>
+            ))}
+          </select>
+          <button className="rem-add-btn" onClick={add} disabled={!title.trim()}>+</button>
+        </div>
+      </div>
+
+      {reminders.length === 0 ? (
+        <div className="rem-empty"><span>🌱</span><p>Add your first habit reminder above</p></div>
+      ) : (
+        <div className="rem-list">
+          <AnimatePresence>
+            {reminders.map(r => {
+              const info  = catInfo(r.category);
+              const color = REM_COLORS[r.category] || "#10b981";
+              return (
+                <motion.div
+                  key={r.id}
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, x: 20, height: 0, marginBottom: 0 }}
+                  transition={{ duration: 0.22 }}
+                  className={`rem-item${r.done ? " rem-item--done" : ""}`}
+                  style={{ borderLeftColor: color }}
+                >
+                  <button
+                    className={`rem-check${r.done ? " rem-check--on" : ""}`}
+                    style={r.done ? { background: color, borderColor: color } : { borderColor: color }}
+                    onClick={() => toggle(r.id)}
+                    aria-label="Toggle complete"
+                  >
+                    {r.done && "✓"}
+                  </button>
+                  <div className="rem-icon-wrap" style={{ background: `${color}18`, color }}>
+                    {info.icon}
+                  </div>
+                  <div className="rem-info">
+                    <span className="rem-title">{r.title}</span>
+                    <div className="rem-meta">
+                      <span className="rem-cat" style={{ color }}>{info.label}</span>
+                      {r.time && <span className="rem-time">· {r.time}</span>}
+                    </div>
+                  </div>
+                  <button className="rem-delete" onClick={() => remove(r.id)} aria-label="Delete">✕</button>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ════════════════════════════════════
+   MAIN DASHBOARD
+   ════════════════════════════════════ */
 export default function Dashboard() {
   const name          = localStorage.getItem("name")          || "";
   const prakriti      = localStorage.getItem("prakriti")      || "";
@@ -57,7 +378,7 @@ export default function Dashboard() {
   const goalShort     = goal.length > 14 ? goal.split(" ").slice(0, 2).join(" ") : goal;
 
   const [streak,  setStreak]  = useState(parseInt(localStorage.getItem("streak") || "0", 10));
-  const [toast,   setToast]   = useState(false);
+  const [toast,   setToast]   = useState<string | null>(null);
   const [barW,    setBarW]    = useState("0%");
   const [mounted, setMounted] = useState(false);
 
@@ -66,14 +387,20 @@ export default function Dashboard() {
     return { wakeTime: s.wakeTime || "", sleepTime: s.sleepTime || "", mealTime: s.mealTime || "", screenTime: s.screenTime || "" };
   });
 
-  const [foodQuery,   setFoodQuery]   = useState("");
-  const [foodQty,     setFoodQty]     = useState(1);
-  const [foodLog,     setFoodLog]     = useState<FoodEntry[]>([]);
-  const [foodError,   setFoodError]   = useState("");
-  const [foodLoading, setFoodLoading] = useState(false);
+  const [meals, setMeals] = useState<Record<MealCat, MealState>>({
+    breakfast: blankMeal(true),
+    lunch:     blankMeal(),
+    snacks:    blankMeal(),
+    dinner:    blankMeal(),
+  });
 
   const [aiPlan,    setAiPlan]    = useState<AiPlan | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiError,   setAiError]   = useState("");
+
+  // Ref for always-fresh meals in addFood async closure
+  const mealsRef = useRef(meals);
+  mealsRef.current = meals;
 
   useEffect(() => {
     const t1 = setTimeout(() => setBarW("78%"), 500);
@@ -81,54 +408,72 @@ export default function Dashboard() {
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
-  const totalCal     = foodLog.reduce((s, f) => s + f.cal, 0);
-  const totalProtein = foodLog.reduce((s, f) => s + f.protein, 0);
-  const totalCarbs   = foodLog.reduce((s, f) => s + f.carbs, 0);
-  const totalFats    = foodLog.reduce((s, f) => s + f.fats, 0);
+  function showToast(msg: string) {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3500);
+  }
+
+  /* ── Derived totals ── */
+  const allFood      = useMemo(() => (Object.values(meals) as MealState[]).flatMap(m => m.log), [meals]);
+  const totalCal     = useMemo(() => allFood.reduce((s, f) => s + f.cal, 0), [allFood]);
+  const totalProtein = useMemo(() => allFood.reduce((s, f) => s + f.protein, 0), [allFood]);
+  const totalCarbs   = useMemo(() => allFood.reduce((s, f) => s + f.carbs, 0), [allFood]);
+  const totalFats    = useMemo(() => allFood.reduce((s, f) => s + f.fats, 0), [allFood]);
   const remaining    = dailyCalories ? dailyCalories - totalCal : null;
   const calPct       = dailyCalories ? Math.min((totalCal / dailyCalories) * 100, 100) : 0;
 
-  async function addFood() {
-    const query = foodQuery.trim();
+  const macroData = useMemo(() => allFood.length > 0 ? [
+    { name: "Protein", value: Math.round(totalProtein), color: "#3b82f6" },
+    { name: "Carbs",   value: Math.round(totalCarbs),   color: "#10b981" },
+    { name: "Fats",    value: Math.round(totalFats),    color: "#f59e0b" },
+  ] : [], [allFood.length, totalProtein, totalCarbs, totalFats]);
+
+  /* ── Meal helpers ── */
+  function patchMeal(cat: MealCat, patch: Partial<MealState>) {
+    setMeals(m => ({ ...m, [cat]: { ...m[cat], ...patch } }));
+  }
+
+  async function addFood(cat: MealCat) {
+    const state = mealsRef.current[cat];
+    const query = state.query.trim();
     if (!query) return;
-    setFoodLoading(true);
-    setFoodError("");
+    setMeals(m => ({ ...m, [cat]: { ...m[cat], loading: true, error: "", showSug: false } }));
     try {
       const res  = await fetch(`/api/nutrition?food=${encodeURIComponent(query)}`);
-      const data = await res.json() as { items?: { name: string; calories: number; protein_g: number; carbohydrates_total_g: number; fat_total_g: number }[] };
+      const data = await res.json() as {
+        items?: { name: string; calories: number; protein_g: number; carbohydrates_total_g: number; fat_total_g: number }[]
+      };
       if (!res.ok || !data.items || data.items.length === 0) {
-        setFoodError(`"${query}" not found. Try a different name (e.g. '100g rice').`);
-        alert("❌ Food not found. Please try a more specific name.");
+        setMeals(m => ({ ...m, [cat]: { ...m[cat], loading: false, error: `"${query}" not found. Try a specific name (e.g. '100g rice').` } }));
         return;
       }
       const item  = data.items[0];
-      const scale = foodQty;
-      setFoodLog(log => [...log, {
+      const scale = state.qty;
+      const entry: FoodEntry = {
         name:    item.name,
-        qty:     foodQty,
+        qty:     state.qty,
         cal:     Math.round(item.calories * scale),
         protein: Math.round(item.protein_g * scale * 10) / 10,
         carbs:   Math.round(item.carbohydrates_total_g * scale * 10) / 10,
         fats:    Math.round(item.fat_total_g * scale * 10) / 10,
-      }]);
-      alert(`✅ Nutrition data fetched for "${item.name}"`);
-      setFoodQuery("");
-      setFoodQty(1);
+      };
+      setMeals(m => ({ ...m, [cat]: { ...m[cat], log: [...m[cat].log, entry], query: "", qty: 1, loading: false, error: "" } }));
     } catch {
-      setFoodError("Network error. Please try again.");
-      alert("❌ Failed to fetch nutrition. Check your connection.");
-    } finally {
-      setFoodLoading(false);
+      setMeals(m => ({ ...m, [cat]: { ...m[cat], loading: false, error: "Network error. Please try again." } }));
     }
   }
 
-  function removeFood(i: number) { setFoodLog(log => log.filter((_, idx) => idx !== i)); }
+  function removeFood(cat: MealCat, idx: number) {
+    setMeals(m => ({ ...m, [cat]: { ...m[cat], log: m[cat].log.filter((_, i) => i !== idx) } }));
+  }
 
+  /* ── AI plan ── */
   async function generateDietPlan() {
     setAiLoading(true);
+    setAiError("");
     try {
       const res = await fetch("/api/diet-plan", {
-        method:  "POST",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prakritiType:     prakritiType || prakriti || "Vata-Pitta",
@@ -139,16 +484,16 @@ export default function Dashboard() {
         }),
       });
       const data = await res.json() as AiPlan & { error?: string };
-      if (!res.ok || data.error) { alert("❌ Failed to generate diet plan. Please try again."); return; }
+      if (!res.ok || data.error) { setAiError("Failed to generate plan. Please try again."); return; }
       setAiPlan(data);
-      alert("✅ AI Diet Plan Generated!");
     } catch {
-      alert("❌ Failed to generate diet plan. Check your connection.");
+      setAiError("Network error. Please check your connection.");
     } finally {
       setAiLoading(false);
     }
   }
 
+  /* ── Daily log ── */
   function setField(field: keyof DailyData, value: string) { setDaily(d => ({ ...d, [field]: value })); }
 
   function saveData() {
@@ -160,19 +505,15 @@ export default function Dashboard() {
       localStorage.setItem("streak", String(n));
       localStorage.setItem("lastSavedDate", today);
     }
-    setToast(true);
-    setTimeout(() => setToast(false), 3000);
+    showToast("✅ Data saved! Your streak has been updated.");
   }
 
   const { text: greetText, emoji: greetEmoji } = getGreeting();
   const dateStr = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
 
-  const macroData = foodLog.length > 0 ? [
-    { name: "Protein", value: Math.round(totalProtein), color: "#3b82f6" },
-    { name: "Carbs",   value: Math.round(totalCarbs),   color: "#10b981" },
-    { name: "Fats",    value: Math.round(totalFats),    color: "#f59e0b" },
-  ] : [];
-
+  /* ════════════════════════════════════
+     RENDER
+     ════════════════════════════════════ */
   return (
     <div className={`db-page${mounted ? " db-mounted" : ""}`}>
 
@@ -188,13 +529,11 @@ export default function Dashboard() {
             </div>
             <span className="db-date">{dateStr}</span>
           </div>
-
           <div className="db-greeting">
             {greetText}{firstName ? `, ${firstName}` : ""}!{" "}
             <span className="db-greeting-emoji">{greetEmoji}</span>
           </div>
           <div className="db-greeting-sub">Here's your personalised wellness overview for today.</div>
-
           <div className="db-header-stats">
             <div className="db-hstat">
               <span className="db-hstat-val">78%</span>
@@ -217,7 +556,7 @@ export default function Dashboard() {
       <div className="db-content">
         <div className="db-grid">
 
-          {/* ── LEFT COLUMN ── */}
+          {/* ════ LEFT COLUMN ════ */}
           <div className="db-col-main">
 
             {/* DINACHARYA SCORE */}
@@ -266,10 +605,10 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* CALORIE TRACKER */}
+            {/* CALORIE TRACKER — 4 MEAL SECTIONS */}
             <div className="db-card db-lift">
               <div className="db-card-label">Calorie Tracker</div>
-              <div className="db-section-title" style={{ marginBottom: "1rem" }}>Log Your Meals</div>
+              <div className="db-section-title" style={{ marginBottom: "0.9rem" }}>Log Your Meals</div>
 
               {dailyCalories > 0 && (
                 <div className="cal-target-bar">
@@ -300,53 +639,22 @@ export default function Dashboard() {
                 </div>
               )}
 
-              <div className="cal-add-row">
-                <div className="cal-input-wrap">
-                  <span className="cal-input-icon">🍽️</span>
-                  <input
-                    type="text"
-                    placeholder="e.g. 100g rice, 2 eggs, 1 cup dal"
-                    value={foodQuery}
-                    onChange={e => { setFoodQuery(e.target.value); setFoodError(""); }}
-                    onKeyDown={e => e.key === "Enter" && !foodLoading && addFood()}
-                    className="cal-food-input"
-                    disabled={foodLoading}
+              <div className="meals-wrap">
+                {(Object.keys(MEAL_CONFIG) as MealCat[]).map(cat => (
+                  <MealSection
+                    key={cat}
+                    cat={cat}
+                    state={meals[cat]}
+                    onChange={patch => patchMeal(cat, patch)}
+                    onAdd={addFood}
+                    onRemove={removeFood}
                   />
-                </div>
-                <input
-                  type="number" min={0.5} step={0.5} value={foodQty}
-                  onChange={e => setFoodQty(Number(e.target.value))}
-                  className="cal-qty-input" title="Serving multiplier" disabled={foodLoading}
-                />
-                <button className="cal-add-btn" onClick={addFood} disabled={foodLoading || !foodQuery.trim()}>
-                  {foodLoading ? <span className="cal-btn-spin" /> : <><span>+</span> Add</>}
-                </button>
+                ))}
               </div>
-              {foodError && <p className="cal-error">{foodError}</p>}
 
-              {foodLog.length > 0 ? (
+              {allFood.length > 0 && (
                 <>
-                  <div className="cal-log">
-                    {foodLog.map((entry, i) => (
-                      <div key={i} className="cal-log-row">
-                        <span className="cal-log-food-icon">🥗</span>
-                        <div className="cal-log-info">
-                          <span className="cal-food-name">
-                            {entry.name} <span className="cal-qty">×{entry.qty}</span>
-                          </span>
-                          <div className="cal-macros">
-                            <span className="macro macro-cal">{entry.cal} kcal</span>
-                            <span className="macro macro-p">P {entry.protein}g</span>
-                            <span className="macro macro-c">C {entry.carbs}g</span>
-                            <span className="macro macro-f">F {entry.fats}g</span>
-                          </div>
-                        </div>
-                        <button className="cal-remove" onClick={() => removeFood(i)}>✕</button>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="cal-totals">
+                  <div className="cal-totals" style={{ marginTop: "1rem" }}>
                     {[
                       { num: totalCal.toLocaleString(),     lbl: "kcal",    color: "#10b981" },
                       { num: `${totalProtein.toFixed(1)}g`, lbl: "Protein", color: "#3b82f6" },
@@ -359,7 +667,6 @@ export default function Dashboard() {
                       </div>
                     ))}
                   </div>
-
                   {macroData.length > 0 && (
                     <div className="macro-chart-wrap">
                       <div className="db-card-label" style={{ marginBottom: "0.5rem" }}>Macro Breakdown (grams)</div>
@@ -382,11 +689,6 @@ export default function Dashboard() {
                     </div>
                   )}
                 </>
-              ) : (
-                <div className="cal-empty-state">
-                  <div className="cal-empty-icon">🥗</div>
-                  <p className="cal-empty">No meals logged yet. Try typing "100g rice" or "2 eggs" above.</p>
-                </div>
               )}
             </div>
 
@@ -418,25 +720,24 @@ export default function Dashboard() {
                 </div>
               </div>
               <button className="db-save-btn" onClick={saveData}>💾 Save Today's Data</button>
-              {toast && <div className="db-toast">✅ Data saved! Your streak has been updated.</div>}
+              <AnimatePresence>
+                {toast && (
+                  <motion.div
+                    className="db-toast"
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    {toast}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* REMINDERS */}
-            <div className="db-card db-lift">
-              <div className="db-card-label">Daily Reminders</div>
-              <div className="db-section-title" style={{ marginBottom: "1rem" }}>Ayurvedic Wellness Tips</div>
-              <div className="db-reminder-list">
-                {REMINDERS.map(({ icon, text, color }) => (
-                  <div key={text} className="db-reminder-item" style={{ borderLeftColor: color }}>
-                    <span className="db-r-icon" style={{ background: `${color}18`, color }}>{icon}</span>
-                    <span>{text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
 
-          {/* ── RIGHT COLUMN ── */}
+          {/* ════ RIGHT COLUMN ════ */}
           <div className="db-col-side">
 
             {/* STREAK */}
@@ -500,7 +801,7 @@ export default function Dashboard() {
               )}
             </div>
 
-            {/* AI DIET PLAN */}
+            {/* AI DIET PLAN — SCROLLABLE */}
             <div className="db-card db-lift db-ai-card">
               <div className="db-card-label">Personalized IKS Diet Plan</div>
 
@@ -509,12 +810,10 @@ export default function Dashboard() {
                   <div className="skel skel-title" />
                   <div className="skel skel-badge" />
                   <div className="skel skel-head" />
-                  <div className="skel skel-line" />
-                  <div className="skel skel-line skel--s" />
+                  <div className="skel skel-line" /><div className="skel skel-line skel--s" />
                   <div className="skel skel-line" />
                   <div className="skel skel-head" style={{ marginTop: "0.9rem" }} />
-                  <div className="skel skel-line" />
-                  <div className="skel skel-line skel--s" />
+                  <div className="skel skel-line" /><div className="skel skel-line skel--s" />
                   <p className="ai-skel-label">✨ Generating your personalised plan…</p>
                 </div>
               ) : !aiPlan ? (
@@ -524,50 +823,55 @@ export default function Dashboard() {
                   <p className="ai-plan-hint">
                     Get a personalised Ayurvedic diet plan powered by Gemini AI — tailored to your Prakriti, BMI, health goal, and today's nutrition.
                   </p>
+                  {aiError && <p className="cal-error" style={{ marginBottom: "0.9rem" }}>{aiError}</p>}
                   <button className="ai-gen-btn" onClick={generateDietPlan} disabled={aiLoading}>
                     ✨ Generate AI Plan
                   </button>
                 </div>
               ) : (
-                <div className="ai-plan-result">
-                  <div className="ai-plan-title-row">
+                <>
+                  <div className="ai-plan-sticky-head">
                     <div>
                       <div className="ai-plan-theme">{aiPlan.title}</div>
                       <span className="db-diet-dosha">{aiPlan.prakriti}</span>
                     </div>
                     <button className="ai-regen-btn" onClick={generateDietPlan} disabled={aiLoading} title="Regenerate">↻</button>
                   </div>
-
-                  {aiPlan.calorieAdvice && (
-                    <div className="ai-calorie-advice">
-                      <span>💡</span> {aiPlan.calorieAdvice}
+                  <div className="ai-plan-scroll-body">
+                    {aiPlan.calorieAdvice && (
+                      <div className="ai-calorie-advice"><span>💡</span> {aiPlan.calorieAdvice}</div>
+                    )}
+                    <div className="ai-plan-result">
+                      <div className="iks-diet-section">
+                        <div className="iks-diet-heading iks-eat-head"><span>🥦</span> Eat Today</div>
+                        <ul className="db-diet-list">
+                          {aiPlan.eat.map(item => <li key={item}>{item}</li>)}
+                        </ul>
+                      </div>
+                      <div className="iks-diet-section">
+                        <div className="iks-diet-heading iks-avoid-head"><span>🚫</span> Avoid</div>
+                        <ul className="db-diet-list iks-avoid-list">
+                          {aiPlan.avoid.map(item => <li key={item}>{item}</li>)}
+                        </ul>
+                      </div>
+                      {aiPlan.lifestyle?.length > 0 && (
+                        <div className="iks-diet-section">
+                          <div className="iks-diet-heading iks-life-head"><span>🧘</span> Lifestyle</div>
+                          <ul className="db-diet-list">
+                            {aiPlan.lifestyle.map(item => <li key={item}>{item}</li>)}
+                          </ul>
+                        </div>
+                      )}
                     </div>
-                  )}
-
-                  <div className="iks-diet-section">
-                    <div className="iks-diet-heading iks-eat-head"><span>🥦</span> Eat Today</div>
-                    <ul className="db-diet-list">
-                      {aiPlan.eat.map(item => <li key={item}>{item}</li>)}
-                    </ul>
+                    {aiError && <p className="cal-error" style={{ marginTop: "0.75rem" }}>{aiError}</p>}
                   </div>
-
-                  <div className="iks-diet-section">
-                    <div className="iks-diet-heading iks-avoid-head"><span>🚫</span> Avoid</div>
-                    <ul className="db-diet-list iks-avoid-list">
-                      {aiPlan.avoid.map(item => <li key={item}>{item}</li>)}
-                    </ul>
-                  </div>
-
-                  {aiPlan.lifestyle?.length > 0 && (
-                    <div className="iks-diet-section">
-                      <div className="iks-diet-heading iks-life-head"><span>🧘</span> Lifestyle</div>
-                      <ul className="db-diet-list">
-                        {aiPlan.lifestyle.map(item => <li key={item}>{item}</li>)}
-                      </ul>
-                    </div>
-                  )}
-                </div>
+                </>
               )}
+            </div>
+
+            {/* CUSTOM REMINDERS */}
+            <div className="db-card db-lift">
+              <CustomReminders />
             </div>
 
             {/* HABIT CONSISTENCY CHART */}
