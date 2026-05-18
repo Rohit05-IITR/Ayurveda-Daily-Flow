@@ -11,7 +11,18 @@ import "./dashboard.css";
    TYPES
    ════════════════════════════════════ */
 interface FoodEntry { name: string; qty: number; cal: number; protein: number; carbs: number; fats: number; }
-interface AiPlan   { title: string; prakriti: string; eat: string[]; avoid: string[]; lifestyle: string[]; calorieAdvice: string; }
+interface MealItem  { title: string; desc: string; kcal: number; protein: number; }
+interface AiPlan {
+  title?: string;
+  prakriti?: string;
+  focus: string;
+  breakfast: MealItem[];
+  lunch:     MealItem[];
+  dinner:    MealItem[];
+  snacks:    MealItem[];
+  avoid:     string[];
+  lifestyle: string[];
+}
 interface DailyData { wakeTime: string; sleepTime: string; mealTime: string; screenTime: string; }
 type MealCat = "breakfast" | "lunch" | "snacks" | "dinner";
 interface MealState { log: FoodEntry[]; query: string; qty: number; loading: boolean; error: string; open: boolean; showSug: boolean; }
@@ -50,6 +61,13 @@ const FOOD_LIST = [
   "poha", "upma", "sambar", "biryani", "paratha", "curd", "lassi",
   "100g rice", "2 eggs", "1 cup milk", "1 banana", "100g chicken breast",
   "1 roti", "1 cup dal", "100g paneer", "1 cup oats", "1 apple",
+];
+
+const PLAN_MEAL_SECTIONS = [
+  { key: "breakfast" as const, label: "Breakfast", icon: "🌅", color: "#f97316" },
+  { key: "lunch"     as const, label: "Lunch",     icon: "☀️",  color: "#10b981" },
+  { key: "dinner"    as const, label: "Dinner",    icon: "🌙",  color: "#3b82f6" },
+  { key: "snacks"    as const, label: "Snacks",    icon: "🍎",  color: "#8b5cf6" },
 ];
 
 const WEEKLY_SCORE = [
@@ -394,9 +412,10 @@ export default function Dashboard() {
     dinner:    blankMeal(),
   });
 
-  const [aiPlan,    setAiPlan]    = useState<AiPlan | null>(null);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiError,   setAiError]   = useState("");
+  const [aiPlan,       setAiPlan]       = useState<AiPlan | null>(null);
+  const [aiLoading,    setAiLoading]    = useState(false);
+  const [aiError,      setAiError]      = useState("");
+  const [planSections, setPlanSections] = useState({ eat: true, avoid: false, life: false });
 
   // Ref for always-fresh meals in addFood async closure
   const mealsRef = useRef(meals);
@@ -471,6 +490,7 @@ export default function Dashboard() {
   async function generateDietPlan() {
     setAiLoading(true);
     setAiError("");
+    const todayDate = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
     try {
       const res = await fetch("/api/diet-plan", {
         method: "POST",
@@ -481,11 +501,13 @@ export default function Dashboard() {
           bmi:              bmi || "—",
           dailyCalories,
           consumedCalories: totalCal,
+          todayDate,
         }),
       });
       const data = await res.json() as AiPlan & { error?: string };
       if (!res.ok || data.error) { setAiError("Failed to generate plan. Please try again."); return; }
       setAiPlan(data);
+      setPlanSections({ eat: true, avoid: false, life: false });
     } catch {
       setAiError("Network error. Please check your connection.");
     } finally {
@@ -801,7 +823,7 @@ export default function Dashboard() {
               )}
             </div>
 
-            {/* AI DIET PLAN — SCROLLABLE */}
+            {/* AI DIET PLAN — REDESIGNED */}
             <div className="db-card db-lift db-ai-card">
               <div className="db-card-label">Personalized IKS Diet Plan</div>
 
@@ -825,45 +847,159 @@ export default function Dashboard() {
                   </p>
                   {aiError && <p className="cal-error" style={{ marginBottom: "0.9rem" }}>{aiError}</p>}
                   <button className="ai-gen-btn" onClick={generateDietPlan} disabled={aiLoading}>
-                    ✨ Generate AI Plan
+                    ✨ Generate My Plan
                   </button>
                 </div>
               ) : (
                 <>
+                  {/* TODAY'S FOCUS */}
+                  {aiPlan.focus && (
+                    <div className="ai-focus-bar">
+                      <span className="ai-focus-star">✨</span>
+                      <span className="ai-focus-text">{aiPlan.focus}</span>
+                    </div>
+                  )}
+
+                  {/* STICKY HEADER */}
                   <div className="ai-plan-sticky-head">
                     <div>
-                      <div className="ai-plan-theme">{aiPlan.title}</div>
-                      <span className="db-diet-dosha">{aiPlan.prakriti}</span>
+                      {aiPlan.title && <div className="ai-plan-theme">{aiPlan.title}</div>}
+                      {aiPlan.prakriti && <span className="db-diet-dosha">{aiPlan.prakriti}</span>}
                     </div>
-                    <button className="ai-regen-btn" onClick={generateDietPlan} disabled={aiLoading} title="Regenerate">↻</button>
+                    <button className="ai-regen-btn" onClick={generateDietPlan} disabled={aiLoading} title="Regenerate plan">↻</button>
                   </div>
+
+                  {/* SCROLLABLE BODY */}
                   <div className="ai-plan-scroll-body">
-                    {aiPlan.calorieAdvice && (
-                      <div className="ai-calorie-advice"><span>💡</span> {aiPlan.calorieAdvice}</div>
-                    )}
-                    <div className="ai-plan-result">
-                      <div className="iks-diet-section">
-                        <div className="iks-diet-heading iks-eat-head"><span>🥦</span> Eat Today</div>
-                        <ul className="db-diet-list">
-                          {aiPlan.eat.map(item => <li key={item}>{item}</li>)}
-                        </ul>
-                      </div>
-                      <div className="iks-diet-section">
-                        <div className="iks-diet-heading iks-avoid-head"><span>🚫</span> Avoid</div>
-                        <ul className="db-diet-list iks-avoid-list">
-                          {aiPlan.avoid.map(item => <li key={item}>{item}</li>)}
-                        </ul>
-                      </div>
-                      {aiPlan.lifestyle?.length > 0 && (
-                        <div className="iks-diet-section">
-                          <div className="iks-diet-heading iks-life-head"><span>🧘</span> Lifestyle</div>
-                          <ul className="db-diet-list">
-                            {aiPlan.lifestyle.map(item => <li key={item}>{item}</li>)}
-                          </ul>
-                        </div>
-                      )}
+
+                    {/* EAT TODAY — COLLAPSIBLE */}
+                    <div className="ai-collap-section">
+                      <button
+                        className="ai-collap-toggle ai-collap-toggle--eat"
+                        onClick={() => setPlanSections(s => ({ ...s, eat: !s.eat }))}
+                      >
+                        <span className="ai-collap-icon">🥗</span>
+                        <span className="ai-collap-label">Eat Today</span>
+                        <motion.span className="ai-collap-chevron"
+                          animate={{ rotate: planSections.eat ? 180 : 0 }}
+                          transition={{ duration: 0.2 }}
+                        >▾</motion.span>
+                      </button>
+                      <AnimatePresence initial={false}>
+                        {planSections.eat && (
+                          <motion.div
+                            key="eat"
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                            style={{ overflow: "hidden" }}
+                          >
+                            <div className="ai-eat-body">
+                              {PLAN_MEAL_SECTIONS.map(ms => {
+                                const items = aiPlan[ms.key];
+                                if (!items?.length) return null;
+                                return (
+                                  <div key={ms.key} className="ai-meal-group">
+                                    <div className="ai-meal-group-lbl" style={{ color: ms.color }}>
+                                      <span>{ms.icon}</span>{ms.label}
+                                    </div>
+                                    {items.map((item, i) => (
+                                      <div key={i} className="ai-meal-card" style={{ borderLeftColor: ms.color }}>
+                                        <div className="ai-meal-card-inner">
+                                          <div className="ai-meal-card-title">{item.title}</div>
+                                          {item.desc && <div className="ai-meal-card-desc">{item.desc}</div>}
+                                        </div>
+                                        <div className="ai-meal-card-macros">
+                                          {item.kcal > 0 && <span className="ai-macro-kcal">{item.kcal} kcal</span>}
+                                          {item.protein > 0 && <span className="ai-macro-prot">{item.protein}g P</span>}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
-                    {aiError && <p className="cal-error" style={{ marginTop: "0.75rem" }}>{aiError}</p>}
+
+                    {/* AVOID — COLLAPSIBLE */}
+                    {aiPlan.avoid?.length > 0 && (
+                      <div className="ai-collap-section">
+                        <button
+                          className="ai-collap-toggle ai-collap-toggle--avoid"
+                          onClick={() => setPlanSections(s => ({ ...s, avoid: !s.avoid }))}
+                        >
+                          <span className="ai-collap-icon">🚫</span>
+                          <span className="ai-collap-label">Avoid Today</span>
+                          <span className="ai-avoid-count">{aiPlan.avoid.length}</span>
+                          <motion.span className="ai-collap-chevron"
+                            animate={{ rotate: planSections.avoid ? 180 : 0 }}
+                            transition={{ duration: 0.2 }}
+                          >▾</motion.span>
+                        </button>
+                        <AnimatePresence initial={false}>
+                          {planSections.avoid && (
+                            <motion.div
+                              key="avoid"
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                              style={{ overflow: "hidden" }}
+                            >
+                              <div className="ai-pill-body">
+                                {aiPlan.avoid.map(item => (
+                                  <span key={item} className="ai-avoid-pill">{item}</span>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    )}
+
+                    {/* LIFESTYLE — COLLAPSIBLE */}
+                    {aiPlan.lifestyle?.length > 0 && (
+                      <div className="ai-collap-section">
+                        <button
+                          className="ai-collap-toggle ai-collap-toggle--life"
+                          onClick={() => setPlanSections(s => ({ ...s, life: !s.life }))}
+                        >
+                          <span className="ai-collap-icon">🧘</span>
+                          <span className="ai-collap-label">Lifestyle</span>
+                          <motion.span className="ai-collap-chevron"
+                            animate={{ rotate: planSections.life ? 180 : 0 }}
+                            transition={{ duration: 0.2 }}
+                          >▾</motion.span>
+                        </button>
+                        <AnimatePresence initial={false}>
+                          {planSections.life && (
+                            <motion.div
+                              key="life"
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                              style={{ overflow: "hidden" }}
+                            >
+                              <div className="ai-life-body">
+                                {aiPlan.lifestyle.map((item, i) => (
+                                  <div key={i} className="ai-life-item">
+                                    <span className="ai-life-dot" />
+                                    {item}
+                                  </div>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    )}
+
+                    {aiError && <p className="cal-error" style={{ marginTop: "0.5rem" }}>{aiError}</p>}
                   </div>
                 </>
               )}

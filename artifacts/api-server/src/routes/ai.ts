@@ -32,34 +32,63 @@ aiRouter.get("/nutrition", async (req, res) => {
 /* ── Gemini AI Diet Plan ── */
 aiRouter.post("/diet-plan", async (req, res) => {
   try {
-    const { prakritiType, goal, bmi, dailyCalories, consumedCalories } = req.body as {
+    const { prakritiType, goal, bmi, dailyCalories, consumedCalories, todayDate } = req.body as {
       prakritiType: string;
       goal: string;
       bmi: string;
       dailyCalories: number;
       consumedCalories: number;
+      todayDate: string;
     };
 
-    const systemInstruction = `You are a professional Ayurvedic health coach.
+    const systemInstruction = `You are an elite Ayurvedic nutritionist and wellness coach with 30 years of clinical experience.
 
-Generate a personalized daily wellness plan based on the user's Prakriti (dual dosha), health goal, BMI, and today's nutrition.
+Generate a STRICTLY personalized daily Ayurvedic wellness plan. Return ONLY valid JSON — no markdown, no prose, no explanation whatsoever.
 
-Respond ONLY with a valid JSON object — no markdown, no explanation:
+═══ CONTENT RULES ═══
+- ALL text must be concise — never write paragraphs or long sentences
+- Meal titles: 2–4 words (e.g., "Warm Oatmeal", "Kitchari Bowl", "Mung Soup")
+- Meal descriptions: 3–6 words (e.g., "with dates and ghee", "seasonal vegetables, cumin")
+- Avoid items: 2–4 words each (e.g., "Iced beverages", "Raw salads")
+- Lifestyle items: 4–8 words each (e.g., "Walk 15 mins after lunch")
+- Focus: exactly one calming, specific insight 8–12 words
 
+═══ PRAKRITI FOOD LOGIC ═══
+- Vata: warm, oily, grounding; root vegetables, ghee, cooked grains; avoid cold/raw/dry foods
+- Pitta: cooling, sweet, astringent; cucumber, coconut, coriander; avoid spicy/fried/sour
+- Kapha: light, pungent, dry; millet, lentils, ginger; avoid heavy dairy/sweets/wheat
+- Dual doshas (e.g., Vata-Pitta): intelligently balance both requirements
+
+═══ GOAL FOOD LOGIC ═══
+- Muscle Gain: high protein focus — paneer, lentils, eggs, chicken, tofu, milk, nuts; calorie surplus
+- Weight Loss: high fibre, low calorie density — soups, mung dal, vegetables, salads; avoid dense carbs
+- Weight Gain: calorie-dense wholesome foods — ghee, nuts, full-fat dairy, rice, sweet potato
+- Maintain: balanced macros across all meals
+
+═══ DAILY ROTATION ═══
+Use the date seed to ensure DIFFERENT meals every day. Never repeat the same combination on consecutive days. Rotate grains, proteins, and vegetables.
+
+═══ JSON SCHEMA (respond with ONLY this) ═══
 {
-  "title": "A short inspiring theme (5–8 words)",
-  "prakriti": "The prakriti type provided",
-  "eat": ["5 specific foods or meals to eat today"],
-  "avoid": ["4 foods or habits to avoid today"],
-  "lifestyle": ["3 Ayurvedic lifestyle habits for today"],
-  "calorieAdvice": "One sentence of practical calorie guidance"
-}`;
+  "title": "5–7 word inspiring plan theme",
+  "prakriti": "<prakriti type>",
+  "focus": "One specific 8–12 word daily wellness insight",
+  "breakfast": [{"title": "2–4 words", "desc": "3–6 words", "kcal": <number>, "protein": <number>}],
+  "lunch":     [{"title": "2–4 words", "desc": "3–6 words", "kcal": <number>, "protein": <number>}],
+  "dinner":    [{"title": "2–4 words", "desc": "3–6 words", "kcal": <number>, "protein": <number>}],
+  "snacks":    [{"title": "2–4 words", "desc": "3–6 words", "kcal": <number>, "protein": <number>}],
+  "avoid":     ["4–5 items, 2–4 words each"],
+  "lifestyle": ["3 habits, 4–8 words each"]
+}
+
+Include exactly 1 item per meal section (breakfast, lunch, dinner, snacks).`;
 
     const userPrompt = `Prakriti: ${prakritiType}
 Goal: ${goal}
 BMI: ${bmi}
-Calories Target: ${dailyCalories}
-Consumed Calories: ${consumedCalories}`;
+Daily Calorie Target: ${dailyCalories} kcal
+Consumed Today: ${consumedCalories} kcal
+Date Seed (for daily variety): ${todayDate}`;
 
     const apiKey = process.env.GOOGLE_API_KEY || "";
     const response = await fetch(
@@ -70,7 +99,7 @@ Consumed Calories: ${consumedCalories}`;
         body: JSON.stringify({
           system_instruction: { parts: [{ text: systemInstruction }] },
           contents: [{ parts: [{ text: userPrompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 2048 },
+          generationConfig: { temperature: 0.85, maxOutputTokens: 1024 },
         }),
       },
     );
@@ -82,10 +111,9 @@ Consumed Calories: ${consumedCalories}`;
     }
 
     const data = await response.json() as {
-      candidates: { content: { parts: { text: string }[] } }[];
+      candidates: { content: { parts: { text: string; thought?: boolean }[] } }[];
     };
 
-    // gemini-2.5-flash (thinking model) puts actual response in the last non-thought part
     const parts = data.candidates[0].content.parts as { text?: string; thought?: boolean }[];
     const responsePart = [...parts].reverse().find(p => !p.thought && p.text);
     if (!responsePart?.text) {
@@ -94,11 +122,8 @@ Consumed Calories: ${consumedCalories}`;
     }
 
     let text = responsePart.text;
-
-    // Strip markdown fences and any leading/trailing whitespace
     text = text.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
 
-    // Extract the first JSON object in the response
     const match = text.match(/\{[\s\S]*\}/);
     if (!match) {
       res.status(502).json({ error: "No JSON found in Gemini response", raw: text.slice(0, 300) });

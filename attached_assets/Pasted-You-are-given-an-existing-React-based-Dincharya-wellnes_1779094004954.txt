@@ -1,0 +1,346 @@
+You are given an existing React-based "Dincharya" wellness dashboard.
+
+The AI-generated Ayurvedic plan card is currently functional but the UI feels cluttered and text-heavy.
+
+Your task is to redesign ONLY the AI plan card experience while keeping the existing dashboard design language.
+
+--------------------------------------------------
+
+CURRENT PROBLEMS
+
+1. Too much text flooding
+2. Poor content hierarchy
+3. Hard to scan quickly
+4. Long paragraphs reduce readability
+5. "Eat Today" section is overwhelming
+6. Users should receive NEW food suggestions daily
+7. Meal suggestions are not deeply personalized
+
+--------------------------------------------------
+
+PART 1: REDESIGN AI PLAN CARD LAYOUT
+
+Keep the same:
+- pastel wellness theme
+- rounded premium card
+- soft gradients
+
+But improve:
+- spacing
+- readability
+- structure
+- visual hierarchy
+
+--------------------------------------------------
+
+PART 2: SHORTEN CONTENT
+
+AI responses should become:
+- concise
+- actionable
+- scan-friendly
+
+Limit:
+- max 2 lines per recommendation
+- no long paragraphs
+- avoid generic explanations
+
+Tone:
+- premium wellness coach
+- modern
+- calm
+- minimal
+
+--------------------------------------------------
+
+PART 3: SPLIT "EAT TODAY" INTO MEALS
+
+Instead of one huge food list:
+
+Create sections:
+1. Breakfast
+2. Lunch
+3. Dinner
+
+Optional:
+4. Snacks
+
+Each section should contain:
+- 1 or 2 meal recommendations only
+- meal title
+- short food description
+
+Example:
+
+BREAKFAST
+🥣 Warm oatmeal with dates & ghee
+
+LUNCH
+🍛 Kitchari with seasonal vegetables
+
+DINNER
+🥗 Light soup with steamed rice
+
+--------------------------------------------------
+
+PART 4: PERSONALIZED MEAL GENERATION
+
+VERY IMPORTANT:
+
+Meal recommendations must be generated based on ALL of these:
+
+1. User Prakriti
+- Vata
+- Pitta
+- Kapha
+- Vata-Pitta
+- Pitta-Kapha
+- Vata-Kapha
+
+2. User Goal
+- Weight Gain
+- Muscle Gain
+- Weight Loss
+- Maintain
+
+3. BMI
+
+4. Daily calorie target
+
+5. User meal history (optional if available)
+
+--------------------------------------------------
+
+PART 5: GOAL-BASED FOOD LOGIC
+
+Examples:
+
+IF:
+Goal = Muscle Gain
+THEN:
+- higher protein meals
+- calorie surplus foods
+- paneer, lentils, milk, nuts, tofu, chicken
+
+IF:
+Goal = Weight Loss
+THEN:
+- lighter meals
+- high fiber
+- low calorie dense foods
+- soups, vegetables, mung, salads
+
+IF:
+Prakriti = Pitta
+THEN:
+- cooling foods
+- avoid spicy/oily foods
+
+IF:
+Prakriti = Vata
+THEN:
+- warm grounding meals
+- healthy fats
+- cooked foods
+
+IF:
+Prakriti = Kapha
+THEN:
+- light spicy foods
+- avoid heavy dairy/sweets
+
+Combine BOTH:
+goal + prakriti intelligently.
+
+--------------------------------------------------
+
+PART 6: DAILY ROTATING FOOD SUGGESTIONS
+
+Currently AI repeats similar foods.
+
+Implement:
+DAILY ROTATION SYSTEM
+
+Logic:
+- Every new day:
+  generate different meal combinations
+
+Requirements:
+- avoid repeating same meals daily
+- rotate ingredients
+- vary cuisines
+- adapt dynamically to:
+  - prakriti
+  - BMI
+  - calorie goal
+  - muscle gain / weight loss
+
+Example:
+Day 1:
+- oats
+- kitchari
+- sweet potato
+
+Day 2:
+- poha
+- paneer bowl
+- mung soup
+
+--------------------------------------------------
+
+PART 7: ADD QUICK VISUAL MEAL CARDS
+
+Each meal recommendation should become:
+- mini meal card
+- compact horizontal layout
+
+Include:
+- emoji/icon
+- meal type
+- calories estimate
+- protein estimate
+
+Example:
+🥣 Breakfast
+420 kcal • 18g protein
+
+--------------------------------------------------
+
+PART 8: ADD "TODAY'S FOCUS"
+
+At top of AI card:
+show ONLY ONE short daily insight.
+
+Examples:
+- "Prioritize hydration today"
+- "Eat lighter after sunset"
+- "Warm foods will improve digestion today"
+
+Keep:
+- max 1 sentence
+- visually highlighted
+
+--------------------------------------------------
+
+PART 9: ADD COLLAPSIBLE SECTIONS
+
+Sections:
+- Eat Today
+- Avoid
+- Lifestyle
+
+Should:
+- expand/collapse
+- smooth animation
+- reduce visual overload
+
+Default:
+Only "Eat Today" expanded
+
+--------------------------------------------------
+
+PART 10: LIMIT CONTENT SIZE
+
+The AI card should NEVER become extremely long.
+
+Implement:
+- max-height
+- internal scrolling
+- elegant thin scrollbar
+
+Goal:
+dashboard stays balanced.
+
+--------------------------------------------------
+
+PART 11: IMPROVE TYPOGRAPHY
+
+Fix:
+- oversized text blocks
+- inconsistent spacing
+- dense paragraphs
+
+Use:
+- better font hierarchy
+- more whitespace
+- compact bullet layouts
+
+--------------------------------------------------
+
+PART 12: IMPROVE GEMINI SYSTEM INSTRUCTION
+
+Update Gemini system instruction so responses are:
+- concise
+- structured
+- meal-focused
+- personalized
+- not essay-style
+
+Gemini should act like:
+"An elite Ayurvedic nutritionist + wellness coach"
+
+Gemini must generate recommendations based on:
+- prakriti
+- fitness goal
+- BMI
+- calorie target
+
+--------------------------------------------------
+
+PART 13: JSON RESPONSE STRUCTURE
+
+Gemini should return structured JSON ONLY:
+
+{
+  "focus": "",
+  "breakfast": [],
+  "lunch": [],
+  "dinner": [],
+  "snacks": [],
+  "avoid": [],
+  "lifestyle": []
+}
+
+No paragraphs.
+No markdown.
+No essays.
+
+--------------------------------------------------
+
+PART 14: KEEP EXISTING FUNCTIONALITY
+
+Do NOT remove:
+- regenerate button
+- prakriti personalization
+- calorie integration
+- AI backend routes
+
+Only improve:
+- structure
+- readability
+- daily personalization
+- UI polish
+
+--------------------------------------------------
+
+TECH STACK
+
+- React
+- Framer Motion
+- Existing Gemini integration
+
+--------------------------------------------------
+
+OUTPUT
+
+Provide:
+1. Updated AI card UI
+2. Goal + prakriti-based meal generation
+3. Daily rotating meal logic
+4. Compact meal cards
+5. Collapsible sections
+6. Improved Gemini system instruction
+7. Structured JSON AI response
+8. Better spacing and typography
+
+No explanation

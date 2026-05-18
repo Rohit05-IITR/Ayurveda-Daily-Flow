@@ -910,6 +910,205 @@
 }
 
 /* ══════════════════════════════════════════
+   AI PLAN CARD — REDESIGNED
+   ══════════════════════════════════════════ */
+
+/* Today's Focus bar */
+.ai-focus-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  background: linear-gradient(135deg, #f0f4ff 0%, #f5f0ff 100%);
+  border: 1px solid #c7d2fe;
+  border-radius: 14px;
+  padding: 0.72rem 0.95rem;
+  margin-bottom: 0.9rem;
+}
+.ai-focus-star {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+.ai-focus-text {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #4338ca;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* Collapsible sections */
+.ai-collap-section {
+  border: 1px solid #eff5ef;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 0.55rem;
+}
+.ai-collap-section:last-child { margin-bottom: 0; }
+
+.ai-collap-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.72rem 0.9rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: background 0.16s;
+  text-align: left;
+}
+.ai-collap-toggle:hover { background: #f6faf6; }
+
+.ai-collap-toggle--eat  { background: #f6fdf6; }
+.ai-collap-toggle--avoid { background: #fff8f8; }
+.ai-collap-toggle--life  { background: #f4f4ff; }
+.ai-collap-toggle--eat:hover  { background: #edfaed; }
+.ai-collap-toggle--avoid:hover { background: #fef0f0; }
+.ai-collap-toggle--life:hover  { background: #ebebff; }
+
+.ai-collap-icon { font-size: 1rem; flex-shrink: 0; }
+.ai-collap-label {
+  flex: 1;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1a2e1a;
+}
+.ai-collap-chevron {
+  font-size: 0.9rem;
+  color: #8a9e8a;
+  display: inline-block;
+  line-height: 1;
+  user-select: none;
+}
+.ai-avoid-count {
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: #fce4ec;
+  color: #b71c1c;
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+}
+
+/* Eat Today body */
+.ai-eat-body {
+  padding: 0.65rem 0.9rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  border-top: 1px solid #eff5ef;
+}
+
+.ai-meal-group {}
+.ai-meal-group-lbl {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.38rem;
+  opacity: 0.85;
+}
+
+.ai-meal-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  background: #f9fdf9;
+  border: 1px solid #e2ede2;
+  border-left: 3px solid;
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  transition: background 0.16s;
+}
+.ai-meal-card:hover { background: #f0f9f0; }
+
+.ai-meal-card-inner { flex: 1; min-width: 0; }
+.ai-meal-card-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1a2e1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0.1rem;
+}
+.ai-meal-card-desc {
+  font-size: 0.76rem;
+  color: #6b7a6b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-meal-card-macros {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  flex-shrink: 0;
+}
+.ai-macro-kcal {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #10b981;
+  white-space: nowrap;
+}
+.ai-macro-prot {
+  font-size: 0.68rem;
+  color: #3b82f6;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Avoid pills */
+.ai-pill-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding: 0.65rem 0.9rem 0.8rem;
+  border-top: 1px solid #fce4ec;
+}
+.ai-avoid-pill {
+  font-size: 0.76rem;
+  font-weight: 600;
+  background: #fce4ec;
+  color: #b71c1c;
+  padding: 0.28rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid #f8bbd0;
+}
+
+/* Lifestyle list */
+.ai-life-body {
+  padding: 0.65rem 0.9rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: 1px solid #ebebff;
+}
+.ai-life-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-size: 0.83rem;
+  color: #3730a3;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.ai-life-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #818cf8;
+  flex-shrink: 0;
+  margin-top: 0.45rem;
+}
+
+/* ══════════════════════════════════════════
    MEAL SECTIONS
    ══════════════════════════════════════════ */
 .meals-wrap {
